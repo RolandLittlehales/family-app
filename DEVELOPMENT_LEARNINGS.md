@@ -158,3 +158,65 @@ globalStyle("@media (max-width: 768px)", { ... }); // Wrong syntax
 ✅ `http://localhost:3002/streaming` - Streaming services with preview cards
 
 All pages are fully responsive and use the vanilla-extract theme system consistently.
+
+### 8. **Work Breakdown and GitHub Issues Strategy**
+
+**Problem**: Initial approach created too many micro-tasks that didn't represent meaningful units of work, leading to inefficient parallel development.
+
+**Key Insights Learned**:
+
+- **PR Size Guideline**: Target 500-1000 lines of code per PR for optimal review and integration
+- **Domain Grouping**: Group related functionality together rather than splitting by technical layers
+- **Meaningful Units**: Each issue should represent a complete, testable feature or system component
+- **Dependency Clarity**: Clear dependencies enable better parallel execution planning
+
+**Optimal Issue Structure**:
+
+```markdown
+Foundation Layer (No Dependencies - Parallel Safe)
+├── Core Database Setup (800-1200 LOC)
+├── Complete UI Component Library (1500-2000 LOC)  
+├── Theme System Implementation (400-600 LOC)
+└── Search and Filter System (1000-1400 LOC)
+
+Core Layer (Sequential Dependencies)
+├── Complete Authentication System (1800-2500 LOC)
+├── Books Management Backend (1200-1600 LOC)
+└── Streaming Management Backend (1400-1800 LOC)
+
+Feature Layer (Frontend Integration)
+├── Books Management Frontend (1500-2000 LOC)
+└── Streaming Management Frontend (1600-2200 LOC)
+
+Integration Layer (Final Assembly)
+├── User Dashboard & Profile System (1800-2400 LOC)
+├── External API & Data Enrichment (1200-1600 LOC)
+└── Testing & Production Deployment (800-1200 LOC)
+```
+
+**Success Metrics**:
+- **Total Issues**: 12 comprehensive issues vs 500+ micro-tasks
+- **Parallel Execution**: Up to 4 teams can work simultaneously on foundation
+- **Clear Dependencies**: Each issue has well-defined prerequisites
+- **Cohesive PRs**: Each PR delivers complete, testable functionality
+
+**Lesson**: **Size work units for meaningful parallel execution, not arbitrary granularity. Focus on cohesive functionality that can be developed, tested, and reviewed as a complete unit.**
+
+### 9. **GitHub Issues Management Best Practices**
+
+**Effective Issue Structure**:
+
+- **Clear Objective**: Single, focused goal per issue
+- **Technical Requirements**: Detailed implementation specifications
+- **Dependencies**: Explicit prerequisite issues listed
+- **Scope Definition**: What's included and excluded
+- **Success Criteria**: Measurable completion requirements
+- **Time/LOC Estimates**: Realistic sizing for sprint planning
+
+**Master Tracking Issue Benefits**:
+- **Dependency Visualization**: Mermaid graphs show work relationships
+- **Progress Tracking**: Real-time completion status
+- **Team Coordination**: Clear handoff points between teams
+- **Risk Management**: Critical path identification
+
+**Lesson**: **Well-structured issues with clear dependencies and realistic sizing enable efficient team coordination and parallel development at scale.**
