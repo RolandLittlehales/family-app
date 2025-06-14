@@ -1,28 +1,28 @@
 import { style } from "@vanilla-extract/css";
-import { vars, tokens } from "./theme.css";
+import { vars } from "./theme.css";
 
 // Layout utilities
 export const container = style({
   width: "100%",
   marginLeft: "auto",
   marginRight: "auto",
-  paddingLeft: vars.spacing[4],
-  paddingRight: vars.spacing[4],
+  paddingLeft: vars.spacing.medium,
+  paddingRight: vars.spacing.medium,
 
   "@media": {
-    [`screen and (min-width: ${tokens.breakpoints.sm})`]: {
+    "screen and (min-width: 640px)": {
       maxWidth: "640px",
     },
-    [`screen and (min-width: ${tokens.breakpoints.md})`]: {
+    "screen and (min-width: 768px)": {
       maxWidth: "768px",
     },
-    [`screen and (min-width: ${tokens.breakpoints.lg})`]: {
+    "screen and (min-width: 1024px)": {
       maxWidth: "1024px",
     },
-    [`screen and (min-width: ${tokens.breakpoints.xl})`]: {
+    "screen and (min-width: 1280px)": {
       maxWidth: "1280px",
     },
-    [`screen and (min-width: ${tokens.breakpoints["2xl"]})`]: {
+    "screen and (min-width: 1536px)": {
       maxWidth: "1536px",
     },
   },
@@ -30,8 +30,8 @@ export const container = style({
 
 export const containerFluid = style({
   width: "100%",
-  paddingLeft: vars.spacing[4],
-  paddingRight: vars.spacing[4],
+  paddingLeft: vars.spacing.medium,
+  paddingRight: vars.spacing.medium,
 });
 
 // Flexbox utilities
@@ -131,109 +131,81 @@ export const gridCols12 = style({
 });
 
 export const gap1 = style({
-  gap: vars.spacing[1],
+  gap: vars.spacing.small,
 });
 
 export const gap2 = style({
-  gap: vars.spacing[2],
+  gap: vars.spacing.medium,
 });
 
 export const gap3 = style({
-  gap: vars.spacing[3],
+  gap: vars.spacing.large,
 });
 
 export const gap4 = style({
-  gap: vars.spacing[4],
-});
-
-export const gap6 = style({
-  gap: vars.spacing[6],
-});
-
-export const gap8 = style({
-  gap: vars.spacing[8],
+  gap: vars.spacing.xlarge,
 });
 
 // Spacing utilities
-export const m0 = style({ margin: vars.spacing[0] });
-export const m1 = style({ margin: vars.spacing[1] });
-export const m2 = style({ margin: vars.spacing[2] });
-export const m3 = style({ margin: vars.spacing[3] });
-export const m4 = style({ margin: vars.spacing[4] });
-export const m6 = style({ margin: vars.spacing[6] });
-export const m8 = style({ margin: vars.spacing[8] });
+export const m0 = style({ margin: "0" });
+export const m1 = style({ margin: vars.spacing.small });
+export const m2 = style({ margin: vars.spacing.medium });
+export const m3 = style({ margin: vars.spacing.large });
+export const m4 = style({ margin: vars.spacing.xlarge });
 
-export const mt0 = style({ marginTop: vars.spacing[0] });
-export const mt1 = style({ marginTop: vars.spacing[1] });
-export const mt2 = style({ marginTop: vars.spacing[2] });
-export const mt3 = style({ marginTop: vars.spacing[3] });
-export const mt4 = style({ marginTop: vars.spacing[4] });
-export const mt6 = style({ marginTop: vars.spacing[6] });
-export const mt8 = style({ marginTop: vars.spacing[8] });
+export const mt0 = style({ marginTop: "0" });
+export const mt1 = style({ marginTop: vars.spacing.small });
+export const mt2 = style({ marginTop: vars.spacing.medium });
+export const mt3 = style({ marginTop: vars.spacing.large });
+export const mt4 = style({ marginTop: vars.spacing.xlarge });
 
-export const mb0 = style({ marginBottom: vars.spacing[0] });
-export const mb1 = style({ marginBottom: vars.spacing[1] });
-export const mb2 = style({ marginBottom: vars.spacing[2] });
-export const mb3 = style({ marginBottom: vars.spacing[3] });
-export const mb4 = style({ marginBottom: vars.spacing[4] });
-export const mb6 = style({ marginBottom: vars.spacing[6] });
-export const mb8 = style({ marginBottom: vars.spacing[8] });
+export const mr0 = style({ marginRight: "0" });
+export const mr1 = style({ marginRight: vars.spacing.small });
+export const mr2 = style({ marginRight: vars.spacing.medium });
+export const mr3 = style({ marginRight: vars.spacing.large });
+export const mr4 = style({ marginRight: vars.spacing.xlarge });
 
-export const ml0 = style({ marginLeft: vars.spacing[0] });
-export const ml1 = style({ marginLeft: vars.spacing[1] });
-export const ml2 = style({ marginLeft: vars.spacing[2] });
-export const ml3 = style({ marginLeft: vars.spacing[3] });
-export const ml4 = style({ marginLeft: vars.spacing[4] });
-export const ml6 = style({ marginLeft: vars.spacing[6] });
-export const ml8 = style({ marginLeft: vars.spacing[8] });
+export const mb0 = style({ marginBottom: "0" });
+export const mb1 = style({ marginBottom: vars.spacing.small });
+export const mb2 = style({ marginBottom: vars.spacing.medium });
+export const mb3 = style({ marginBottom: vars.spacing.large });
+export const mb4 = style({ marginBottom: vars.spacing.xlarge });
 
-export const mr0 = style({ marginRight: vars.spacing[0] });
-export const mr1 = style({ marginRight: vars.spacing[1] });
-export const mr2 = style({ marginRight: vars.spacing[2] });
-export const mr3 = style({ marginRight: vars.spacing[3] });
-export const mr4 = style({ marginRight: vars.spacing[4] });
-export const mr6 = style({ marginRight: vars.spacing[6] });
-export const mr8 = style({ marginRight: vars.spacing[8] });
+export const ml0 = style({ marginLeft: "0" });
+export const ml1 = style({ marginLeft: vars.spacing.small });
+export const ml2 = style({ marginLeft: vars.spacing.medium });
+export const ml3 = style({ marginLeft: vars.spacing.large });
+export const ml4 = style({ marginLeft: vars.spacing.xlarge });
 
-export const p0 = style({ padding: vars.spacing[0] });
-export const p1 = style({ padding: vars.spacing[1] });
-export const p2 = style({ padding: vars.spacing[2] });
-export const p3 = style({ padding: vars.spacing[3] });
-export const p4 = style({ padding: vars.spacing[4] });
-export const p6 = style({ padding: vars.spacing[6] });
-export const p8 = style({ padding: vars.spacing[8] });
+export const p0 = style({ padding: "0" });
+export const p1 = style({ padding: vars.spacing.small });
+export const p2 = style({ padding: vars.spacing.medium });
+export const p3 = style({ padding: vars.spacing.large });
+export const p4 = style({ padding: vars.spacing.xlarge });
 
-export const pt0 = style({ paddingTop: vars.spacing[0] });
-export const pt1 = style({ paddingTop: vars.spacing[1] });
-export const pt2 = style({ paddingTop: vars.spacing[2] });
-export const pt3 = style({ paddingTop: vars.spacing[3] });
-export const pt4 = style({ paddingTop: vars.spacing[4] });
-export const pt6 = style({ paddingTop: vars.spacing[6] });
-export const pt8 = style({ paddingTop: vars.spacing[8] });
+export const pt0 = style({ paddingTop: "0" });
+export const pt1 = style({ paddingTop: vars.spacing.small });
+export const pt2 = style({ paddingTop: vars.spacing.medium });
+export const pt3 = style({ paddingTop: vars.spacing.large });
+export const pt4 = style({ paddingTop: vars.spacing.xlarge });
 
-export const pb0 = style({ paddingBottom: vars.spacing[0] });
-export const pb1 = style({ paddingBottom: vars.spacing[1] });
-export const pb2 = style({ paddingBottom: vars.spacing[2] });
-export const pb3 = style({ paddingBottom: vars.spacing[3] });
-export const pb4 = style({ paddingBottom: vars.spacing[4] });
-export const pb6 = style({ paddingBottom: vars.spacing[6] });
-export const pb8 = style({ paddingBottom: vars.spacing[8] });
+export const pr0 = style({ paddingRight: "0" });
+export const pr1 = style({ paddingRight: vars.spacing.small });
+export const pr2 = style({ paddingRight: vars.spacing.medium });
+export const pr3 = style({ paddingRight: vars.spacing.large });
+export const pr4 = style({ paddingRight: vars.spacing.xlarge });
 
-export const pl0 = style({ paddingLeft: vars.spacing[0] });
-export const pl1 = style({ paddingLeft: vars.spacing[1] });
-export const pl2 = style({ paddingLeft: vars.spacing[2] });
-export const pl3 = style({ paddingLeft: vars.spacing[3] });
-export const pl4 = style({ paddingLeft: vars.spacing[4] });
-export const pl6 = style({ paddingLeft: vars.spacing[6] });
-export const pl8 = style({ paddingLeft: vars.spacing[8] });
+export const pb0 = style({ paddingBottom: "0" });
+export const pb1 = style({ paddingBottom: vars.spacing.small });
+export const pb2 = style({ paddingBottom: vars.spacing.medium });
+export const pb3 = style({ paddingBottom: vars.spacing.large });
+export const pb4 = style({ paddingBottom: vars.spacing.xlarge });
 
-export const pr0 = style({ paddingRight: vars.spacing[0] });
-export const pr1 = style({ paddingRight: vars.spacing[1] });
-export const pr2 = style({ paddingRight: vars.spacing[2] });
-export const pr3 = style({ paddingRight: vars.spacing[3] });
-export const pr4 = style({ paddingRight: vars.spacing[4] });
-export const pr6 = style({ paddingRight: vars.spacing[6] });
-export const pr8 = style({ paddingRight: vars.spacing[8] });
+export const pl0 = style({ paddingLeft: "0" });
+export const pl1 = style({ paddingLeft: vars.spacing.small });
+export const pl2 = style({ paddingLeft: vars.spacing.medium });
+export const pl3 = style({ paddingLeft: vars.spacing.large });
+export const pl4 = style({ paddingLeft: vars.spacing.xlarge });
 
 // Text utilities
 export const textLeft = style({
@@ -253,191 +225,132 @@ export const textJustify = style({
 });
 
 export const textXs = style({
-  fontSize: tokens.typography.fontSize.xs,
+  fontSize: vars.typography.fontSize.small,
 });
 
 export const textSm = style({
-  fontSize: tokens.typography.fontSize.sm,
+  fontSize: vars.typography.fontSize.small,
 });
 
 export const textBase = style({
-  fontSize: tokens.typography.fontSize.base,
+  fontSize: vars.typography.fontSize.base,
 });
 
 export const textLg = style({
-  fontSize: tokens.typography.fontSize.lg,
+  fontSize: vars.typography.fontSize.large,
 });
 
 export const textXl = style({
-  fontSize: tokens.typography.fontSize.xl,
+  fontSize: vars.typography.fontSize.xlarge,
 });
 
 export const text2xl = style({
-  fontSize: tokens.typography.fontSize["2xl"],
+  fontSize: vars.typography.fontSize["2xl"],
 });
 
 export const text3xl = style({
-  fontSize: tokens.typography.fontSize["3xl"],
-});
-
-export const text4xl = style({
-  fontSize: tokens.typography.fontSize["4xl"],
+  fontSize: vars.typography.fontSize["3xl"],
 });
 
 export const fontLight = style({
-  fontWeight: tokens.typography.fontWeight.light,
+  fontWeight: "300",
 });
 
 export const fontNormal = style({
-  fontWeight: tokens.typography.fontWeight.normal,
+  fontWeight: vars.typography.fontWeight.normal,
 });
 
 export const fontMedium = style({
-  fontWeight: tokens.typography.fontWeight.medium,
+  fontWeight: vars.typography.fontWeight.medium,
 });
 
 export const fontSemibold = style({
-  fontWeight: tokens.typography.fontWeight.semibold,
+  fontWeight: vars.typography.fontWeight.semibold,
 });
 
 export const fontBold = style({
-  fontWeight: tokens.typography.fontWeight.bold,
+  fontWeight: vars.typography.fontWeight.bold,
 });
 
 // Color utilities
 export const textPrimary = style({
-  color: vars.color.text.primary,
+  color: vars.colors.foreground,
 });
 
 export const textSecondary = style({
-  color: vars.color.text.secondary,
+  color: vars.colors.mutedForeground,
 });
 
-export const textTertiary = style({
-  color: vars.color.text.tertiary,
+export const textMuted = style({
+  color: vars.colors.mutedForeground,
 });
 
-export const textBrand = style({
-  color: vars.color.brand.primary,
+export const textAccent = style({
+  color: vars.colors.accent,
 });
 
-export const textSuccess = style({
-  color: vars.color.semantic.success,
-});
-
-export const textWarning = style({
-  color: vars.color.semantic.warning,
-});
-
-export const textError = style({
-  color: vars.color.semantic.error,
-});
-
-export const textInfo = style({
-  color: vars.color.semantic.info,
-});
-
-// Background utilities
 export const bgPrimary = style({
-  backgroundColor: vars.color.background.primary,
+  backgroundColor: vars.colors.background,
 });
 
 export const bgSecondary = style({
-  backgroundColor: vars.color.background.secondary,
+  backgroundColor: vars.colors.muted,
 });
 
-export const bgTertiary = style({
-  backgroundColor: vars.color.background.tertiary,
-});
-
-export const bgBrand = style({
-  backgroundColor: vars.color.brand.primary,
-});
-
-export const bgSuccess = style({
-  backgroundColor: vars.color.semantic.successBackground,
-});
-
-export const bgWarning = style({
-  backgroundColor: vars.color.semantic.warningBackground,
-});
-
-export const bgError = style({
-  backgroundColor: vars.color.semantic.errorBackground,
-});
-
-export const bgInfo = style({
-  backgroundColor: vars.color.semantic.infoBackground,
+export const bgAccent = style({
+  backgroundColor: vars.colors.accent,
 });
 
 // Border utilities
 export const border = style({
-  border: `1px solid ${vars.color.border.primary}`,
+  border: `1px solid ${vars.colors.border}`,
 });
 
-export const borderPrimary = style({
-  borderColor: vars.color.border.primary,
+export const borderT = style({
+  borderTop: `1px solid ${vars.colors.border}`,
 });
 
-export const borderSecondary = style({
-  borderColor: vars.color.border.secondary,
+export const borderR = style({
+  borderRight: `1px solid ${vars.colors.border}`,
 });
 
-export const borderFocus = style({
-  borderColor: vars.color.border.focus,
+export const borderB = style({
+  borderBottom: `1px solid ${vars.colors.border}`,
 });
 
-export const borderError = style({
-  borderColor: vars.color.border.error,
+export const borderL = style({
+  borderLeft: `1px solid ${vars.colors.border}`,
 });
 
 export const rounded = style({
-  borderRadius: vars.borderRadius.base,
+  borderRadius: vars.radii.medium,
 });
 
 export const roundedSm = style({
-  borderRadius: vars.borderRadius.sm,
-});
-
-export const roundedMd = style({
-  borderRadius: vars.borderRadius.md,
+  borderRadius: vars.radii.small,
 });
 
 export const roundedLg = style({
-  borderRadius: vars.borderRadius.lg,
-});
-
-export const roundedXl = style({
-  borderRadius: vars.borderRadius.xl,
+  borderRadius: vars.radii.large,
 });
 
 export const roundedFull = style({
-  borderRadius: vars.borderRadius.full,
+  borderRadius: vars.radii.full,
 });
 
 // Shadow utilities
-export const shadow = style({
-  boxShadow: vars.boxShadow.base,
-});
-
 export const shadowSm = style({
-  boxShadow: vars.boxShadow.sm,
+  boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
 });
 
 export const shadowMd = style({
-  boxShadow: vars.boxShadow.md,
+  boxShadow:
+    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 });
 
 export const shadowLg = style({
-  boxShadow: vars.boxShadow.lg,
-});
-
-export const shadowXl = style({
-  boxShadow: vars.boxShadow.xl,
-});
-
-export const shadow2xl = style({
-  boxShadow: vars.boxShadow["2xl"],
+  boxShadow:
+    "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
 });
 
 // Position utilities
@@ -474,19 +387,6 @@ export const hidden = style({
   display: "none",
 });
 
-// Overflow utilities
-export const overflowHidden = style({
-  overflow: "hidden",
-});
-
-export const overflowAuto = style({
-  overflow: "auto",
-});
-
-export const overflowScroll = style({
-  overflow: "scroll",
-});
-
 // Width and height utilities
 export const wFull = style({
   width: "100%",
@@ -504,39 +404,23 @@ export const hScreen = style({
   height: "100vh",
 });
 
-// Accessibility utilities
-export const srOnly = style({
-  position: "absolute",
-  width: "1px",
-  height: "1px",
-  padding: "0",
-  margin: "-1px",
-  overflow: "hidden",
-  clip: "rect(0, 0, 0, 0)",
-  whiteSpace: "nowrap",
-  borderWidth: "0",
-});
-
 // Transition utilities
 export const transition = style({
-  transition: `all ${tokens.animation.duration.normal} ${tokens.animation.easing.easeInOut}`,
+  transition: "all 0.2s ease",
 });
 
 export const transitionFast = style({
-  transition: `all ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
+  transition: "all 0.1s ease",
 });
 
 export const transitionSlow = style({
-  transition: `all ${tokens.animation.duration.slow} ${tokens.animation.easing.easeInOut}`,
+  transition: "all 0.3s ease",
 });
 
 // Focus utilities
 export const focusRing = style({
   ":focus": {
-    outline: `2px solid ${vars.color.border.focus}`,
+    outline: `2px solid ${vars.colors.primary}`,
     outlineOffset: "2px",
-  },
-  ":focus:not(:focus-visible)": {
-    outline: "none",
   },
 });

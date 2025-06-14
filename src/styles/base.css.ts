@@ -1,5 +1,5 @@
 import { globalStyle } from "@vanilla-extract/css";
-import { vars, tokens } from "./theme.css";
+import { vars } from "./theme.css";
 
 // CSS Reset and base styles
 globalStyle("*, *::before, *::after", {
@@ -15,15 +15,12 @@ globalStyle("html, body", {
 });
 
 globalStyle("body", {
-  fontFamily: vars.typography.fontFamily.sans,
-  fontSize: tokens.typography.fontSize.base,
-  fontWeight: tokens.typography.fontWeight.normal,
-  lineHeight: tokens.typography.lineHeight.normal,
-  color: vars.color.text.primary,
-  backgroundColor: vars.color.background.primary,
+  fontSize: vars.typography.fontSize.base,
+  fontWeight: vars.typography.fontWeight.normal,
+  color: vars.colors.foreground,
+  backgroundColor: vars.colors.background,
   WebkitFontSmoothing: "antialiased",
   MozOsxFontSmoothing: "grayscale",
-  // Improved text rendering
   textRendering: "optimizeLegibility",
 });
 
@@ -33,88 +30,85 @@ globalStyle("#root, #__next", {
 
 // Typography styles
 globalStyle("h1, h2, h3, h4, h5, h6", {
-  fontWeight: tokens.typography.fontWeight.semibold,
-  lineHeight: tokens.typography.lineHeight.tight,
-  color: vars.color.text.primary,
-  marginBottom: vars.spacing[4],
+  fontWeight: vars.typography.fontWeight.semibold,
+  color: vars.colors.foreground,
+  marginBottom: vars.spacing.medium,
 });
 
 globalStyle("h1", {
-  fontSize: tokens.typography.fontSize["4xl"],
-  fontWeight: tokens.typography.fontWeight.bold,
+  fontSize: vars.typography.fontSize["3xl"],
+  fontWeight: vars.typography.fontWeight.bold,
 });
 
 globalStyle("h2", {
-  fontSize: tokens.typography.fontSize["3xl"],
+  fontSize: vars.typography.fontSize["2xl"],
 });
 
 globalStyle("h3", {
-  fontSize: tokens.typography.fontSize["2xl"],
+  fontSize: vars.typography.fontSize.xlarge,
 });
 
 globalStyle("h4", {
-  fontSize: tokens.typography.fontSize.xl,
+  fontSize: vars.typography.fontSize.large,
 });
 
 globalStyle("h5", {
-  fontSize: tokens.typography.fontSize.lg,
+  fontSize: vars.typography.fontSize.base,
 });
 
 globalStyle("h6", {
-  fontSize: tokens.typography.fontSize.base,
+  fontSize: vars.typography.fontSize.small,
 });
 
 globalStyle("p", {
-  marginBottom: vars.spacing[4],
-  lineHeight: tokens.typography.lineHeight.relaxed,
+  marginBottom: vars.spacing.medium,
+  lineHeight: "1.6",
 });
 
 globalStyle("a", {
-  color: vars.color.brand.primary,
+  color: vars.colors.primary,
   textDecoration: "none",
-  transition: `color ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
+  transition: "color 0.2s ease",
 });
 
 globalStyle("a:hover", {
-  color: vars.color.brand.primaryHover,
+  color: vars.colors.primaryHover,
   textDecoration: "underline",
 });
 
 globalStyle("a:focus", {
-  outline: `2px solid ${vars.color.border.focus}`,
+  outline: `2px solid ${vars.colors.primary}`,
   outlineOffset: "2px",
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: vars.radii.small,
 });
 
 // List styles
 globalStyle("ul, ol", {
-  paddingLeft: vars.spacing[6],
-  marginBottom: vars.spacing[4],
+  paddingLeft: vars.spacing.large,
+  marginBottom: vars.spacing.medium,
 });
 
 globalStyle("li", {
-  marginBottom: vars.spacing[2],
+  marginBottom: vars.spacing.small,
 });
 
 // Code styles
 globalStyle("code", {
-  fontFamily: vars.typography.fontFamily.mono,
-  fontSize: tokens.typography.fontSize.sm,
-  backgroundColor: vars.color.background.secondary,
-  padding: `${vars.spacing[1]} ${vars.spacing[2]}`,
-  borderRadius: vars.borderRadius.base,
-  border: `1px solid ${vars.color.border.primary}`,
+  fontSize: vars.typography.fontSize.small,
+  backgroundColor: vars.colors.muted,
+  padding: `${vars.spacing.small} ${vars.spacing.medium}`,
+  borderRadius: vars.radii.small,
+  border: `1px solid ${vars.colors.border}`,
 });
 
 globalStyle("pre", {
-  fontFamily: vars.typography.fontFamily.mono,
-  fontSize: tokens.typography.fontSize.sm,
-  backgroundColor: vars.color.background.secondary,
-  padding: vars.spacing[4],
-  borderRadius: vars.borderRadius.lg,
-  border: `1px solid ${vars.color.border.primary}`,
+  fontSize: vars.typography.fontSize.small,
+  backgroundColor: vars.colors.muted,
+  padding: vars.spacing.medium,
+  borderRadius: vars.radii.medium,
+  border: `1px solid ${vars.colors.border}`,
   overflow: "auto",
-  marginBottom: vars.spacing[4],
+  marginBottom: vars.spacing.medium,
 });
 
 globalStyle("pre code", {
@@ -156,41 +150,23 @@ globalStyle("table", {
   borderCollapse: "collapse",
   borderSpacing: 0,
   width: "100%",
-  marginBottom: vars.spacing[4],
+  marginBottom: vars.spacing.medium,
 });
 
 globalStyle("th, td", {
-  padding: vars.spacing[3],
+  padding: vars.spacing.medium,
   textAlign: "left",
-  borderBottom: `1px solid ${vars.color.border.primary}`,
+  borderBottom: `1px solid ${vars.colors.border}`,
 });
 
 globalStyle("th", {
-  fontWeight: tokens.typography.fontWeight.semibold,
-  backgroundColor: vars.color.background.secondary,
-});
-
-// Blockquote styles
-globalStyle("blockquote", {
-  borderLeft: `4px solid ${vars.color.brand.primary}`,
-  paddingLeft: vars.spacing[4],
-  marginLeft: 0,
-  marginBottom: vars.spacing[4],
-  fontStyle: "italic",
-  color: vars.color.text.secondary,
-});
-
-// HR styles
-globalStyle("hr", {
-  border: "none",
-  height: "1px",
-  backgroundColor: vars.color.border.primary,
-  margin: `${vars.spacing[8]} 0`,
+  fontWeight: vars.typography.fontWeight.semibold,
+  backgroundColor: vars.colors.muted,
 });
 
 // Focus styles for accessibility
 globalStyle("*:focus", {
-  outline: `2px solid ${vars.color.border.focus}`,
+  outline: `2px solid ${vars.colors.primary}`,
   outlineOffset: "2px",
 });
 
@@ -201,8 +177,8 @@ globalStyle("*:focus:not(:focus-visible)", {
 
 // Selection styles
 globalStyle("::selection", {
-  backgroundColor: vars.color.brand.primary,
-  color: vars.color.text.inverse,
+  backgroundColor: vars.colors.primary,
+  color: vars.colors.background,
 });
 
 // Scrollbar styles (webkit)
@@ -212,63 +188,26 @@ globalStyle("::-webkit-scrollbar", {
 });
 
 globalStyle("::-webkit-scrollbar-track", {
-  backgroundColor: vars.color.background.secondary,
+  backgroundColor: vars.colors.muted,
 });
 
 globalStyle("::-webkit-scrollbar-thumb", {
-  backgroundColor: vars.color.border.secondary,
-  borderRadius: vars.borderRadius.full,
+  backgroundColor: vars.colors.border,
+  borderRadius: vars.radii.full,
 });
 
 globalStyle("::-webkit-scrollbar-thumb:hover", {
-  backgroundColor: vars.color.text.tertiary,
-});
-
-// Print styles
-globalStyle("@media print", {
-  "*": {
-    backgroundColor: "white !important",
-    color: "black !important",
-    boxShadow: "none !important",
-    textShadow: "none !important",
-  },
-  "a, a:visited": {
-    textDecoration: "underline",
-  },
-  "a[href]:after": {
-    content: " (" + "attr(href)" + ")",
-  },
-  "abbr[title]:after": {
-    content: " (" + "attr(title)" + ")",
-  },
-  "pre, blockquote": {
-    border: "1px solid #999",
-    pageBreakInside: "avoid",
-  },
-  thead: {
-    display: "table-header-group",
-  },
-  "tr, img": {
-    pageBreakInside: "avoid",
-  },
-  img: {
-    maxWidth: "100% !important",
-  },
-  "p, h2, h3": {
-    orphans: 3,
-    widows: 3,
-  },
-  "h2, h3": {
-    pageBreakAfter: "avoid",
-  },
+  backgroundColor: vars.colors.mutedForeground,
 });
 
 // Reduced motion support
-globalStyle("@media (prefers-reduced-motion: reduce)", {
-  "*": {
-    animationDuration: "0.01ms !important",
-    animationIterationCount: "1 !important",
-    transitionDuration: "0.01ms !important",
-    scrollBehavior: "auto !important",
+globalStyle("*", {
+  "@media": {
+    "(prefers-reduced-motion: reduce)": {
+      animationDuration: "0.01ms",
+      animationIterationCount: "1",
+      transitionDuration: "0.01ms",
+      scrollBehavior: "auto",
+    },
   },
 });

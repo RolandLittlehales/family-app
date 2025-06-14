@@ -94,7 +94,7 @@ const eslintConfig = [
       "react/no-is-mounted": "error",
       "react/no-render-return-value": "error",
       "react/no-string-refs": "error",
-      "react/no-unescaped-entities": "error",
+      "react/no-unescaped-entities": "off", // Allow natural apostrophes in copy text
       "react/no-unknown-property": "error",
       "react/require-render-return": "error",
 

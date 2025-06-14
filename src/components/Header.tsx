@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import * as styles from "./Header.css";
-import { ThemeToggle } from "../styles/ThemeToggle";
 
 export interface NavItem {
   href: string;
@@ -69,8 +68,7 @@ export function Header({
           ))}
         </nav>
 
-        {/* Theme Toggle */}
-        <ThemeToggle variant="ghost" size="sm" />
+        {/* Theme Toggle - TODO: Implement theme toggle */}
 
         {/* Mobile Menu Button */}
         <button

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import * as styles from "./page.css";
 
 export const metadata: Metadata = {
   title: "Books - The Family App",
@@ -7,99 +8,86 @@ export const metadata: Metadata = {
 
 export default function BooksPage() {
   return (
-    <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1
-        style={{
-          fontSize: "2.5rem",
-          fontWeight: "bold",
-          marginBottom: "1rem",
-          color: "#111827",
-        }}
-      >
-        Family Books
-      </h1>
-      <p
-        style={{
-          fontSize: "1.125rem",
-          color: "#6B7280",
-          marginBottom: "2rem",
-        }}
-      >
-        Welcome to your family&apos;s book collection. Here you can discover,
+    <div className={styles.container}>
+      <h1 className={styles.title}>Family Books</h1>
+      <p className={styles.subtitle}>
+        Welcome to your family's book collection. Here you can discover,
         organize, and track your reading adventures together.
       </p>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "1.5rem",
-          marginTop: "2rem",
-        }}
-      >
-        <div
-          style={{
-            padding: "1.5rem",
-            border: "1px solid #E5E7EB",
-            borderRadius: "0.5rem",
-            backgroundColor: "#F9FAFB",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "1.25rem",
-              fontWeight: "600",
-              marginBottom: "0.5rem",
-            }}
-          >
-            Reading List
-          </h3>
-          <p style={{ color: "#6B7280" }}>
-            Keep track of books you want to read as a family
+      {/* Stats Overview */}
+      <div className={styles.statsContainer}>
+        <div className={styles.statCard}>
+          <span className={styles.statNumber}>24</span>
+          <span className={styles.statLabel}>Total Books</span>
+        </div>
+        <div className={styles.statCard}>
+          <span className={styles.statNumber}>3</span>
+          <span className={styles.statLabel}>Currently Reading</span>
+        </div>
+        <div className={styles.statCard}>
+          <span className={styles.statNumber}>18</span>
+          <span className={styles.statLabel}>Completed</span>
+        </div>
+        <div className={styles.statCard}>
+          <span className={styles.statNumber}>12</span>
+          <span className={styles.statLabel}>Wishlist</span>
+        </div>
+      </div>
+
+      {/* Feature Cards */}
+      <div className={styles.grid}>
+        <div className={styles.card}>
+          <div className={styles.readingListIcon}>📚</div>
+          <h3 className={styles.cardTitle}>Reading List</h3>
+          <p className={styles.cardDescription}>
+            Keep track of books you want to read as a family. Add new
+            discoveries and organize your future reading adventures.
           </p>
         </div>
 
-        <div
-          style={{
-            padding: "1.5rem",
-            border: "1px solid #E5E7EB",
-            borderRadius: "0.5rem",
-            backgroundColor: "#F9FAFB",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "1.25rem",
-              fontWeight: "600",
-              marginBottom: "0.5rem",
-            }}
-          >
-            Currently Reading
-          </h3>
-          <p style={{ color: "#6B7280" }}>
-            Books that family members are currently enjoying
+        <div className={styles.card}>
+          <div className={styles.currentlyReadingIcon}>📖</div>
+          <h3 className={styles.cardTitle}>Currently Reading</h3>
+          <p className={styles.cardDescription}>
+            Books that family members are currently enjoying. Track progress and
+            share thoughts about ongoing reads.
           </p>
         </div>
 
-        <div
-          style={{
-            padding: "1.5rem",
-            border: "1px solid #E5E7EB",
-            borderRadius: "0.5rem",
-            backgroundColor: "#F9FAFB",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: "1.25rem",
-              fontWeight: "600",
-              marginBottom: "0.5rem",
-            }}
-          >
-            Completed
-          </h3>
-          <p style={{ color: "#6B7280" }}>
-            Books you&apos;ve finished reading together
+        <div className={styles.card}>
+          <div className={styles.completedIcon}>✅</div>
+          <h3 className={styles.cardTitle}>Completed</h3>
+          <p className={styles.cardDescription}>
+            Books you've finished reading together. Rate them, write reviews,
+            and remember your favorite family reading moments.
+          </p>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.readingListIcon}>🎯</div>
+          <h3 className={styles.cardTitle}>Reading Goals</h3>
+          <p className={styles.cardDescription}>
+            Set and track reading goals for each family member. Celebrate
+            achievements and build healthy reading habits together.
+          </p>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.currentlyReadingIcon}>🏆</div>
+          <h3 className={styles.cardTitle}>Recommendations</h3>
+          <p className={styles.cardDescription}>
+            Discover new books based on your family's reading history and
+            preferences. Get personalized suggestions for your next great read.
+          </p>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.completedIcon}>👥</div>
+          <h3 className={styles.cardTitle}>Family Library</h3>
+          <p className={styles.cardDescription}>
+            Manage your physical and digital book collection. Track who has what
+            books and coordinate sharing within the family.
           </p>
         </div>
       </div>

@@ -1,6 +1,5 @@
 import { recipe } from "@vanilla-extract/recipes";
-import { style } from "@vanilla-extract/css";
-import { vars, tokens } from "./theme.css";
+import { vars } from "./theme.css";
 
 // Button component recipe
 export const button = recipe({
@@ -8,24 +7,20 @@ export const button = recipe({
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: vars.borderRadius.md,
-    fontWeight: tokens.typography.fontWeight.medium,
-    fontSize: tokens.typography.fontSize.sm,
+    borderRadius: vars.radii.medium,
+    fontWeight: vars.typography.fontWeight.medium,
+    fontSize: vars.typography.fontSize.small,
     lineHeight: "1",
     textDecoration: "none",
     border: "none",
     cursor: "pointer",
-    transition: `all ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
+    transition: "all 0.2s ease",
     userSelect: "none",
     whiteSpace: "nowrap",
 
     ":focus": {
-      outline: `2px solid ${vars.color.border.focus}`,
+      outline: `2px solid ${vars.colors.primary}`,
       outlineOffset: "2px",
-    },
-
-    ":focus:not(:focus-visible)": {
-      outline: "none",
     },
 
     ":disabled": {
@@ -38,84 +33,57 @@ export const button = recipe({
   variants: {
     variant: {
       primary: {
-        backgroundColor: vars.color.brand.primary,
-        color: vars.color.text.inverse,
+        backgroundColor: vars.colors.primary,
+        color: vars.colors.background,
 
         ":hover": {
-          backgroundColor: vars.color.brand.primaryHover,
+          backgroundColor: vars.colors.primaryHover,
         },
 
         ":active": {
-          backgroundColor: vars.color.brand.primaryActive,
+          opacity: 0.9,
         },
       },
 
       secondary: {
-        backgroundColor: vars.color.background.secondary,
-        color: vars.color.text.primary,
-        border: `1px solid ${vars.color.border.primary}`,
+        backgroundColor: vars.colors.muted,
+        color: vars.colors.foreground,
+        border: `1px solid ${vars.colors.border}`,
 
         ":hover": {
-          backgroundColor: vars.color.interactive.hover,
-          borderColor: vars.color.border.secondary,
+          backgroundColor: vars.colors.mutedForeground,
+          borderColor: vars.colors.primary,
         },
 
         ":active": {
-          backgroundColor: vars.color.interactive.active,
+          opacity: 0.9,
         },
       },
 
       outline: {
         backgroundColor: "transparent",
-        color: vars.color.brand.primary,
-        border: `1px solid ${vars.color.brand.primary}`,
+        color: vars.colors.primary,
+        border: `1px solid ${vars.colors.primary}`,
 
         ":hover": {
-          backgroundColor: vars.color.brand.primary,
-          color: vars.color.text.inverse,
+          backgroundColor: vars.colors.primary,
+          color: vars.colors.background,
         },
 
         ":active": {
-          backgroundColor: vars.color.brand.primaryActive,
+          opacity: 0.9,
         },
       },
 
       ghost: {
         backgroundColor: "transparent",
-        color: vars.color.text.primary,
+        color: vars.colors.foreground,
 
         ":hover": {
-          backgroundColor: vars.color.interactive.hover,
+          backgroundColor: vars.colors.muted,
         },
 
         ":active": {
-          backgroundColor: vars.color.interactive.active,
-        },
-      },
-
-      success: {
-        backgroundColor: vars.color.semantic.success,
-        color: vars.color.text.inverse,
-
-        ":hover": {
-          opacity: 0.9,
-        },
-      },
-
-      warning: {
-        backgroundColor: vars.color.semantic.warning,
-        color: vars.color.text.inverse,
-
-        ":hover": {
-          opacity: 0.9,
-        },
-      },
-
-      error: {
-        backgroundColor: vars.color.semantic.error,
-        color: vars.color.text.inverse,
-
-        ":hover": {
           opacity: 0.9,
         },
       },
@@ -124,37 +92,37 @@ export const button = recipe({
     size: {
       xs: {
         height: "24px",
-        paddingLeft: vars.spacing[2],
-        paddingRight: vars.spacing[2],
-        fontSize: tokens.typography.fontSize.xs,
+        paddingLeft: vars.spacing.small,
+        paddingRight: vars.spacing.small,
+        fontSize: vars.typography.fontSize.small,
       },
 
       sm: {
         height: "32px",
-        paddingLeft: vars.spacing[3],
-        paddingRight: vars.spacing[3],
-        fontSize: tokens.typography.fontSize.sm,
+        paddingLeft: vars.spacing.medium,
+        paddingRight: vars.spacing.medium,
+        fontSize: vars.typography.fontSize.small,
       },
 
       md: {
         height: "40px",
-        paddingLeft: vars.spacing[4],
-        paddingRight: vars.spacing[4],
-        fontSize: tokens.typography.fontSize.sm,
+        paddingLeft: vars.spacing.medium,
+        paddingRight: vars.spacing.medium,
+        fontSize: vars.typography.fontSize.base,
       },
 
       lg: {
         height: "48px",
-        paddingLeft: vars.spacing[6],
-        paddingRight: vars.spacing[6],
-        fontSize: tokens.typography.fontSize.base,
+        paddingLeft: vars.spacing.large,
+        paddingRight: vars.spacing.large,
+        fontSize: vars.typography.fontSize.large,
       },
 
       xl: {
         height: "56px",
-        paddingLeft: vars.spacing[8],
-        paddingRight: vars.spacing[8],
-        fontSize: tokens.typography.fontSize.lg,
+        paddingLeft: vars.spacing.xlarge,
+        paddingRight: vars.spacing.xlarge,
+        fontSize: vars.typography.fontSize.xlarge,
       },
     },
 
@@ -175,29 +143,29 @@ export const button = recipe({
 export const input = recipe({
   base: {
     appearance: "none",
-    backgroundColor: vars.color.background.primary,
-    border: `1px solid ${vars.color.border.primary}`,
-    borderRadius: vars.borderRadius.md,
-    fontSize: tokens.typography.fontSize.sm,
+    backgroundColor: vars.colors.background,
+    border: `1px solid ${vars.colors.border}`,
+    borderRadius: vars.radii.medium,
+    fontSize: vars.typography.fontSize.base,
     lineHeight: "1.5",
-    padding: `${vars.spacing[2]} ${vars.spacing[3]}`,
-    color: vars.color.text.primary,
-    transition: `all ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
+    padding: `${vars.spacing.small} ${vars.spacing.medium}`,
+    color: vars.colors.foreground,
+    transition: "all 0.2s ease",
     width: "100%",
 
     "::placeholder": {
-      color: vars.color.text.tertiary,
+      color: vars.colors.mutedForeground,
     },
 
     ":focus": {
       outline: "none",
-      borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 3px ${vars.color.brand.primary}33`,
+      borderColor: vars.colors.primary,
+      boxShadow: `0 0 0 3px ${vars.colors.primary}33`,
     },
 
     ":disabled": {
-      backgroundColor: vars.color.interactive.disabled,
-      color: vars.color.text.disabled,
+      backgroundColor: vars.colors.muted,
+      color: vars.colors.mutedForeground,
       cursor: "not-allowed",
     },
   },
@@ -207,29 +175,29 @@ export const input = recipe({
       default: {},
 
       error: {
-        borderColor: vars.color.border.error,
+        borderColor: vars.colors.primary,
 
         ":focus": {
-          borderColor: vars.color.border.error,
-          boxShadow: `0 0 0 3px ${vars.color.semantic.error}33`,
+          borderColor: vars.colors.primary,
+          boxShadow: `0 0 0 3px ${vars.colors.primary}33`,
         },
       },
     },
 
     size: {
       sm: {
-        padding: `${vars.spacing[1]} ${vars.spacing[2]}`,
-        fontSize: tokens.typography.fontSize.xs,
+        padding: `${vars.spacing.small} ${vars.spacing.small}`,
+        fontSize: vars.typography.fontSize.small,
       },
 
       md: {
-        padding: `${vars.spacing[2]} ${vars.spacing[3]}`,
-        fontSize: tokens.typography.fontSize.sm,
+        padding: `${vars.spacing.small} ${vars.spacing.medium}`,
+        fontSize: vars.typography.fontSize.base,
       },
 
       lg: {
-        padding: `${vars.spacing[3]} ${vars.spacing[4]}`,
-        fontSize: tokens.typography.fontSize.base,
+        padding: `${vars.spacing.medium} ${vars.spacing.large}`,
+        fontSize: vars.typography.fontSize.large,
       },
     },
   },
@@ -243,20 +211,22 @@ export const input = recipe({
 // Card component recipe
 export const card = recipe({
   base: {
-    backgroundColor: vars.color.background.primary,
-    border: `1px solid ${vars.color.border.primary}`,
-    borderRadius: vars.borderRadius.lg,
+    backgroundColor: vars.colors.background,
+    border: `1px solid ${vars.colors.border}`,
+    borderRadius: vars.radii.large,
     overflow: "hidden",
   },
 
   variants: {
     variant: {
       default: {
-        boxShadow: vars.boxShadow.sm,
+        boxShadow:
+          "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
       },
 
       elevated: {
-        boxShadow: vars.boxShadow.md,
+        boxShadow:
+          "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
       },
 
       flat: {
@@ -270,30 +240,27 @@ export const card = recipe({
       },
 
       sm: {
-        padding: vars.spacing[3],
+        padding: vars.spacing.medium,
       },
 
       md: {
-        padding: vars.spacing[4],
+        padding: vars.spacing.large,
       },
 
       lg: {
-        padding: vars.spacing[6],
-      },
-
-      xl: {
-        padding: vars.spacing[8],
+        padding: vars.spacing.xlarge,
       },
     },
 
     interactive: {
       true: {
         cursor: "pointer",
-        transition: `all ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
+        transition: "all 0.2s ease",
 
         ":hover": {
           transform: "translateY(-1px)",
-          boxShadow: vars.boxShadow.md,
+          boxShadow:
+            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
         },
       },
     },
@@ -302,275 +269,5 @@ export const card = recipe({
   defaultVariants: {
     variant: "default",
     padding: "md",
-  },
-});
-
-// Badge component recipe
-export const badge = recipe({
-  base: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: vars.borderRadius.full,
-    fontSize: tokens.typography.fontSize.xs,
-    fontWeight: tokens.typography.fontWeight.medium,
-    lineHeight: "1",
-    textTransform: "uppercase",
-    letterSpacing: tokens.typography.letterSpacing.wide,
-    whiteSpace: "nowrap",
-  },
-
-  variants: {
-    variant: {
-      default: {
-        backgroundColor: vars.color.background.secondary,
-        color: vars.color.text.secondary,
-      },
-
-      primary: {
-        backgroundColor: vars.color.brand.primary,
-        color: vars.color.text.inverse,
-      },
-
-      secondary: {
-        backgroundColor: vars.color.brand.secondary,
-        color: vars.color.text.inverse,
-      },
-
-      success: {
-        backgroundColor: vars.color.semantic.success,
-        color: vars.color.text.inverse,
-      },
-
-      warning: {
-        backgroundColor: vars.color.semantic.warning,
-        color: vars.color.text.inverse,
-      },
-
-      error: {
-        backgroundColor: vars.color.semantic.error,
-        color: vars.color.text.inverse,
-      },
-
-      info: {
-        backgroundColor: vars.color.semantic.info,
-        color: vars.color.text.inverse,
-      },
-
-      outline: {
-        backgroundColor: "transparent",
-        color: vars.color.text.primary,
-        border: `1px solid ${vars.color.border.primary}`,
-      },
-    },
-
-    size: {
-      sm: {
-        padding: `${vars.spacing[1]} ${vars.spacing[2]}`,
-        fontSize: tokens.typography.fontSize.xs,
-      },
-
-      md: {
-        padding: `${vars.spacing[1]} ${vars.spacing[3]}`,
-        fontSize: tokens.typography.fontSize.xs,
-      },
-
-      lg: {
-        padding: `${vars.spacing[2]} ${vars.spacing[4]}`,
-        fontSize: tokens.typography.fontSize.sm,
-      },
-    },
-  },
-
-  defaultVariants: {
-    variant: "default",
-    size: "md",
-  },
-});
-
-// Alert component recipe
-export const alert = recipe({
-  base: {
-    borderRadius: vars.borderRadius.md,
-    padding: vars.spacing[4],
-    border: "1px solid",
-    fontSize: tokens.typography.fontSize.sm,
-    lineHeight: tokens.typography.lineHeight.relaxed,
-  },
-
-  variants: {
-    variant: {
-      info: {
-        backgroundColor: vars.color.semantic.infoBackground,
-        borderColor: vars.color.semantic.infoBorder,
-        color: vars.color.semantic.info,
-      },
-
-      success: {
-        backgroundColor: vars.color.semantic.successBackground,
-        borderColor: vars.color.semantic.successBorder,
-        color: vars.color.semantic.success,
-      },
-
-      warning: {
-        backgroundColor: vars.color.semantic.warningBackground,
-        borderColor: vars.color.semantic.warningBorder,
-        color: vars.color.semantic.warning,
-      },
-
-      error: {
-        backgroundColor: vars.color.semantic.errorBackground,
-        borderColor: vars.color.semantic.errorBorder,
-        color: vars.color.semantic.error,
-      },
-    },
-  },
-
-  defaultVariants: {
-    variant: "info",
-  },
-});
-
-// Avatar component styles
-export const avatar = recipe({
-  base: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: vars.borderRadius.full,
-    backgroundColor: vars.color.background.secondary,
-    color: vars.color.text.secondary,
-    fontWeight: tokens.typography.fontWeight.medium,
-    overflow: "hidden",
-    userSelect: "none",
-  },
-
-  variants: {
-    size: {
-      xs: {
-        width: "24px",
-        height: "24px",
-        fontSize: tokens.typography.fontSize.xs,
-      },
-
-      sm: {
-        width: "32px",
-        height: "32px",
-        fontSize: tokens.typography.fontSize.sm,
-      },
-
-      md: {
-        width: "40px",
-        height: "40px",
-        fontSize: tokens.typography.fontSize.base,
-      },
-
-      lg: {
-        width: "48px",
-        height: "48px",
-        fontSize: tokens.typography.fontSize.lg,
-      },
-
-      xl: {
-        width: "64px",
-        height: "64px",
-        fontSize: tokens.typography.fontSize.xl,
-      },
-
-      "2xl": {
-        width: "80px",
-        height: "80px",
-        fontSize: tokens.typography.fontSize["2xl"],
-      },
-    },
-  },
-
-  defaultVariants: {
-    size: "md",
-  },
-});
-
-// Loading spinner styles
-export const spinner = style({
-  display: "inline-block",
-  width: "20px",
-  height: "20px",
-  border: `2px solid ${vars.color.border.primary}`,
-  borderRadius: vars.borderRadius.full,
-  borderTopColor: vars.color.brand.primary,
-  animation: "spin 1s linear infinite",
-
-  "@keyframes": {
-    spin: {
-      "0%": { transform: "rotate(0deg)" },
-      "100%": { transform: "rotate(360deg)" },
-    },
-  },
-});
-
-// Tooltip styles
-export const tooltip = style({
-  position: "relative",
-  display: "inline-block",
-
-  "::before": {
-    content: "attr(data-tooltip)",
-    position: "absolute",
-    bottom: "100%",
-    left: "50%",
-    transform: "translateX(-50%)",
-    backgroundColor: vars.color.background.inverse,
-    color: vars.color.text.inverse,
-    padding: `${vars.spacing[1]} ${vars.spacing[2]}`,
-    borderRadius: vars.borderRadius.sm,
-    fontSize: tokens.typography.fontSize.xs,
-    whiteSpace: "nowrap",
-    opacity: 0,
-    visibility: "hidden",
-    transition: `all ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
-    zIndex: vars.zIndex.tooltip,
-    marginBottom: vars.spacing[1],
-  },
-
-  "::after": {
-    content: '""',
-    position: "absolute",
-    bottom: "100%",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: 0,
-    height: 0,
-    borderLeft: "4px solid transparent",
-    borderRight: "4px solid transparent",
-    borderTop: `4px solid ${vars.color.background.inverse}`,
-    opacity: 0,
-    visibility: "hidden",
-    transition: `all ${tokens.animation.duration.fast} ${tokens.animation.easing.easeInOut}`,
-    zIndex: vars.zIndex.tooltip,
-  },
-
-  ":hover::before, :hover::after": {
-    opacity: 1,
-    visibility: "visible",
-  },
-});
-
-// Divider styles
-export const divider = style({
-  border: "none",
-  height: "1px",
-  backgroundColor: vars.color.border.primary,
-  margin: `${vars.spacing[4]} 0`,
-});
-
-// Focus ring utility
-export const focusRing = style({
-  ":focus": {
-    outline: `2px solid ${vars.color.border.focus}`,
-    outlineOffset: "2px",
-  },
-
-  ":focus:not(:focus-visible)": {
-    outline: "none",
   },
 });
