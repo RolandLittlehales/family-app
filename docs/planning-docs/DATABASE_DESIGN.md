@@ -25,7 +25,7 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
   avatar_url VARCHAR(512),
-  role VARCHAR(50) DEFAULT 'member', -- 'admin', 'member', 'child'
+  -- Removed role field - roles are family-specific and handled in family_members table
   date_of_birth DATE,
   preferences JSONB DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -65,8 +65,8 @@ CREATE TABLE books (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(500) NOT NULL,
   author VARCHAR(500),
-  isbn VARCHAR(20),
-  isbn13 VARCHAR(20),
+  isbn VARCHAR(20) CHECK (isbn IS NULL OR length(isbn) = 10),
+  isbn13 VARCHAR(20) CHECK (isbn13 IS NULL OR length(isbn13) = 13),
   google_books_id VARCHAR(100),
   description TEXT,
   page_count INTEGER,
@@ -81,12 +81,14 @@ CREATE TABLE books (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  -- Indexes for performance
-  INDEX idx_books_title ON books(title),
-  INDEX idx_books_author ON books(author),
-  INDEX idx_books_isbn ON books(isbn),
-  INDEX idx_books_isbn13 ON books(isbn13)
+  -- Note: Indexes moved to separate CREATE INDEX statements below
 );
+
+-- Indexes for books table
+CREATE INDEX idx_books_title ON books(title);
+CREATE INDEX idx_books_author ON books(author);
+CREATE INDEX idx_books_isbn ON books(isbn);
+CREATE INDEX idx_books_isbn13 ON books(isbn13);
 ```
 
 #### 5. User Books Table (Reading Status)
@@ -108,11 +110,14 @@ CREATE TABLE user_books (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  UNIQUE(user_id, book_id),
-  INDEX idx_user_books_status ON user_books(status),
-  INDEX idx_user_books_family ON user_books(family_id),
-  INDEX idx_user_books_rating ON user_books(rating)
+  UNIQUE(user_id, book_id)
 );
+
+-- Indexes for user_books table
+CREATE INDEX idx_user_books_status ON user_books(status);
+CREATE INDEX idx_user_books_family ON user_books(family_id);
+CREATE INDEX idx_user_books_family_status ON user_books(family_id, status);
+CREATE INDEX idx_user_books_rating ON user_books(rating);
 ```
 
 #### 6. Reading Sessions Table (For Progress Tracking)
@@ -121,7 +126,7 @@ CREATE TABLE reading_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_book_id UUID NOT NULL REFERENCES user_books(id) ON DELETE CASCADE,
   start_page INTEGER NOT NULL,
-  end_page INTEGER NOT NULL,
+  end_page INTEGER NOT NULL CHECK (end_page >= start_page),
   duration_minutes INTEGER, -- optional: how long they read
   session_date DATE NOT NULL DEFAULT CURRENT_DATE,
   notes TEXT,
@@ -157,10 +162,13 @@ CREATE TABLE media (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  INDEX idx_media_title ON media(title),
-  INDEX idx_media_type ON media(type),
-  INDEX idx_media_tmdb ON media(tmdb_id)
+  -- Note: Indexes moved to separate CREATE INDEX statements below
 );
+
+-- Indexes for media table
+CREATE INDEX idx_media_title ON media(title);
+CREATE INDEX idx_media_type ON media(type);
+CREATE INDEX idx_media_tmdb ON media(tmdb_id);
 ```
 
 #### 8. User Media Table (Watching Status)
@@ -174,8 +182,8 @@ CREATE TABLE user_media (
   rating INTEGER CHECK (rating >= 1 AND rating <= 5),
   review TEXT,
   notes TEXT,
-  current_season INTEGER DEFAULT 1,
-  current_episode INTEGER DEFAULT 1,
+  current_season INTEGER DEFAULT NULL,
+  current_episode INTEGER DEFAULT NULL,
   total_watched_episodes INTEGER DEFAULT 0,
   start_date DATE,
   finish_date DATE,
@@ -185,11 +193,14 @@ CREATE TABLE user_media (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  UNIQUE(user_id, media_id),
-  INDEX idx_user_media_status ON user_media(status),
-  INDEX idx_user_media_family ON user_media(family_id),
-  INDEX idx_user_media_priority ON user_media(watch_priority)
+  UNIQUE(user_id, media_id)
 );
+
+-- Indexes for user_media table
+CREATE INDEX idx_user_media_status ON user_media(status);
+CREATE INDEX idx_user_media_family ON user_media(family_id);
+CREATE INDEX idx_user_media_family_status ON user_media(family_id, status);
+CREATE INDEX idx_user_media_priority ON user_media(watch_priority);
 ```
 
 #### 9. Streaming Services Table
@@ -223,7 +234,7 @@ CREATE TABLE family_subscriptions (
   monthly_cost DECIMAL(8,2),
   billing_date INTEGER, -- day of month (1-31)
   shared_account BOOLEAN DEFAULT FALSE, -- sharing with others outside family
-  login_email VARCHAR(255),
+  -- Removed login_email field for security reasons
   notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -244,10 +255,13 @@ CREATE TABLE media_availability (
   purchase_price DECIMAL(6,2), -- if available for purchase
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  UNIQUE(media_id, service_id),
-  INDEX idx_availability_media ON media_availability(media_id),
-  INDEX idx_availability_service ON media_availability(service_id)
+  UNIQUE(media_id, service_id)
 );
+
+-- Indexes for media_availability table
+CREATE INDEX idx_availability_media ON media_availability(media_id);
+CREATE INDEX idx_availability_service ON media_availability(service_id);
+CREATE INDEX idx_availability_until ON media_availability(available_until);
 ```
 
 ### Shared Features Tables
@@ -309,7 +323,7 @@ CREATE TABLE family_goals (
   type VARCHAR(50) NOT NULL, -- 'reading', 'watching'
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  target_value INTEGER NOT NULL, -- books to read, hours to watch, etc.
+  target_value INTEGER NOT NULL CHECK (target_value > 0), -- books to read, hours to watch, etc.
   target_unit VARCHAR(20) NOT NULL, -- 'books', 'hours', 'episodes'
   deadline DATE,
   is_active BOOLEAN DEFAULT TRUE,
@@ -332,6 +346,80 @@ CREATE TABLE goal_progress (
 );
 ```
 
+### Authentication & Security Tables
+
+#### 17. Family Invitations Table
+```sql
+CREATE TABLE family_invitations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+  email VARCHAR(255) NOT NULL,
+  token VARCHAR(512) NOT NULL UNIQUE,
+  invited_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  used_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  INDEX idx_invitations_token ON family_invitations(token),
+  INDEX idx_invitations_email ON family_invitations(email),
+  INDEX idx_invitations_expires ON family_invitations(expires_at)
+);
+```
+
+#### 18. User Sessions Table (For NextAuth)
+```sql
+CREATE TABLE user_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  session_token VARCHAR(255) NOT NULL UNIQUE,
+  expires TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  INDEX idx_sessions_token ON user_sessions(session_token),
+  INDEX idx_sessions_expires ON user_sessions(expires)
+);
+```
+
+#### 19. OAuth Accounts Table (For NextAuth)
+```sql
+CREATE TABLE accounts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL,
+  provider VARCHAR(50) NOT NULL,
+  provider_account_id VARCHAR(255) NOT NULL,
+  refresh_token TEXT,
+  access_token TEXT,
+  expires_at INTEGER,
+  token_type VARCHAR(50),
+  scope TEXT,
+  id_token TEXT,
+  session_state TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  UNIQUE(provider, provider_account_id),
+  INDEX idx_accounts_user ON accounts(user_id)
+);
+```
+
+#### 20. Content Ratings & Parental Controls
+```sql
+CREATE TABLE content_ratings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+  content_type VARCHAR(20) NOT NULL, -- 'book', 'media'
+  content_id UUID NOT NULL, -- references books.id or media.id
+  min_age INTEGER NOT NULL,
+  reason TEXT,
+  created_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  UNIQUE(family_id, content_type, content_id),
+  INDEX idx_content_ratings_family ON content_ratings(family_id),
+  INDEX idx_content_ratings_age ON content_ratings(min_age)
+);
+```
+
 ## Prisma Schema Equivalent
 
 ```prisma
@@ -350,7 +438,7 @@ model User {
   email           String    @unique
   name            String
   avatarUrl       String?   @map("avatar_url")
-  role            String    @default("member")
+  -- Removed role field - roles are family-specific
   dateOfBirth     DateTime? @map("date_of_birth") @db.Date
   preferences     Json      @default("{}")
   createdAt       DateTime  @default(now()) @map("created_at")
