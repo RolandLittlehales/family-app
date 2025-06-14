@@ -25,38 +25,39 @@
 ### 1.1 Database & Data Layer
 **Status**: Missing entirely
 **Requirements**:
-- Choose database solution (PostgreSQL, SQLite, or Supabase)
-- Design schema for:
+- **Database Solution**: Firestore (NoSQL document database) - chosen for integration with Google Cloud Platform and Firebase ecosystem
+- Design document structure for:
   - Users/Family members
-  - Books (title, author, status, ratings, notes, reading dates)
-  - Movies/Shows (title, genre, platform, status, ratings, watch dates)
-  - Categories and tags
-- Implement data access layer (Prisma ORM recommended)
+  - Books (title, author, status, ratings, notes, reading dates, owner, currentHolder)
+  - Movies/Shows (title, genre, platform, status, ratings, watch dates, owner, currentHolder)
+  - Unified tags system (cross-asset tagging)
+  - Unified genre categories (shared across books, movies, TV shows)
+- Implement data access layer with Firebase SDK
 - Add data validation with Zod
 
 ### 1.2 Authentication & User Management
 **Status**: Missing entirely
 **Requirements**:
-- Implement authentication system (NextAuth.js or Clerk)
+- **Authentication Strategy**: Leverage Next.js built-in authentication capabilities and Firebase Auth for seamless integration
 - Family account management
 - User profiles and preferences
-- Role-based permissions (admin, member)
+- **Role-based permissions**: admin, member, guest (guest has no write access, limited view permissions)
 
 ### 1.3 State Management
-**Status**: No global state management
+**Status**: Stateless architecture planned
 **Requirements**:
-- Choose state management solution (Zustand, Redux Toolkit, or React Context)
-- Implement stores for:
-  - User authentication state
-  - Books data
-  - Streaming/movies data
-  - UI state (theme, preferences)
+- **Stateless Approach**: Always update online DB via APIs, no persistent local state
+- **Temporary Local State**: Implement a simple Firestore-like wrapper for development that can easily be converted to use Firestore
+- UI state management (theme, preferences) using React Context or local storage
+- Real-time data synchronization with Firestore
 
 ## Priority 2: Books Feature Implementation
 
 ### 2.1 Books CRUD Operations
 **Requirements**:
 - Add new books (manual entry, ISBN lookup, search integration)
+  - **Ownership Tracking**: Track book owner (defaults to current user) and current holder (who physically has the book, defaults to owner)
+  - **Duplicate Support**: Allow duplicate books with personalized notes for different family members
 - Edit book details
 - Delete books
 - Bulk operations
@@ -148,7 +149,9 @@
 
 ### 5.1 Search and Discovery
 **Requirements**:
-- Global search across books and movies
+- **Global search across all asset types** (books, movies, TV shows)
+- **Unified tagging system**: Custom tags work across all asset types
+- **Unified genre categories**: Genre filtering returns results across all asset types (e.g., "Fantasy" returns fantasy books AND movies)
 - Advanced filtering options
 - Search suggestions and autocomplete
 - Recently viewed items
