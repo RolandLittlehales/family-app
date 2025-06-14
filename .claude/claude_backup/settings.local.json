@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "WebFetch(domain:vanilla-extract.style)",
+      "Bash(ls:*)",
+      "Bash(mv:*)"
+    ],
+    "deny": []
+  }
+}
