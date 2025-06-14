@@ -349,3 +349,89 @@ model User {
 - **File organization**: Separate concerns to minimize overlapping changes
 
 **Lesson**: **Merge conflicts are normal in collaborative development. Identify them early through regular syncing, resolve them systematically, and document the resolution process for team knowledge.**
+
+### 12. **GitHub CLI Authentication Flow & User Communication**
+
+**Problem**: When using GitHub CLI commands (`gh`), authentication prompts can appear unexpectedly and may be missed by users, causing commands to fail silently or hang.
+
+**Authentication Scenarios**:
+
+1. **First-time setup**: User hasn't authenticated with GitHub CLI
+2. **Token expiration**: Existing authentication has expired
+3. **Permission changes**: New scopes required for specific operations
+4. **Network issues**: Authentication server temporarily unavailable
+
+**User Communication Best Practices**:
+
+**Always inform users when authentication may be required**:
+```bash
+# ❌ Bad - Silent authentication attempt
+gh pr create --title "..." --body "..."
+
+# ✅ Good - Warn user first
+echo "Creating PR - GitHub authentication may be required..."
+gh pr create --title "..." --body "..."
+```
+
+**Proactive Authentication Check**:
+```bash
+# Check if authenticated before running commands
+gh auth status || {
+    echo "⚠️  GitHub authentication required. Please run: gh auth login"
+    exit 1
+}
+```
+
+**Clear Error Messages**:
+- Explain what authentication is needed
+- Provide exact commands to resolve issues
+- Mention that browser popup may appear
+- Give time estimates for authentication flow
+
+**Authentication Flow Documentation**:
+
+1. **Initial Setup**:
+   ```bash
+   gh auth login
+   # Follow browser prompts (may open new tab)
+   # Choose HTTPS or SSH
+   # Select authentication method
+   ```
+
+2. **Token Refresh**:
+   ```bash
+   gh auth refresh
+   # May require re-authorization in browser
+   ```
+
+3. **Status Check**:
+   ```bash
+   gh auth status
+   # Shows current authentication state
+   # Lists available scopes/permissions
+   ```
+
+**User Experience Guidelines**:
+
+- **Warn before auth-required commands**: "This may require GitHub authentication..."
+- **Explain browser popups**: "A browser window may open for authentication"
+- **Provide fallback options**: Manual token setup instructions
+- **Set expectations**: "Authentication may take 30-60 seconds"
+- **Handle timeouts gracefully**: Clear error messages with next steps
+
+**Claude Instructions for GitHub Operations**:
+
+1. **Always notify user** before running `gh` commands that may require auth
+2. **Explain popup behavior**: Browser windows may open unexpectedly
+3. **Provide context**: Why authentication is needed for the specific operation
+4. **Offer alternatives**: Manual GitHub web interface options if CLI fails
+5. **Check auth status first** when possible: `gh auth status`
+
+**Example Implementation**:
+```bash
+echo "🔐 Creating GitHub PR - authentication popup may appear..."
+echo "If prompted, please complete GitHub login in your browser"
+gh pr create --title "docs: Update requirements" --body "..."
+```
+
+**Lesson**: **GitHub CLI authentication can interrupt workflow unexpectedly. Always communicate with users about potential authentication requirements, browser popups, and provide clear guidance for resolving authentication issues.**
