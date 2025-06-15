@@ -1,4 +1,5 @@
 // Component exports
+export { Button } from "./Button";
 export { Header } from "./Header";
 export { PageLayout, PageSection, PageGrid, StatsGrid } from "./PageLayout";
 
