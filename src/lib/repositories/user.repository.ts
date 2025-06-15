@@ -1,5 +1,10 @@
-import { User, UserRole, Prisma } from '../../generated/prisma';
-import { BaseRepository, PaginationOptions, PaginatedResult, PaginationHelper } from './base.repository';
+import { User, UserRole, Prisma } from "../../generated/prisma";
+import {
+  BaseRepository,
+  PaginationOptions,
+  PaginatedResult,
+  PaginationHelper,
+} from "./base.repository";
 
 export interface CreateUserData {
   email: string;
@@ -85,26 +90,27 @@ export class UserRepository extends BaseRepository {
     filters: UserFilters = {},
     pagination: PaginationOptions = {}
   ): Promise<PaginatedResult<User>> {
-    const { page, limit, skip, take } = PaginationHelper.getPaginationParams(pagination);
-    
+    const { page, limit, skip, take } =
+      PaginationHelper.getPaginationParams(pagination);
+
     const where: Prisma.UserWhereInput = {};
-    
+
     if (filters.familyId) {
       where.familyId = filters.familyId;
     }
-    
+
     if (filters.role) {
       where.role = filters.role;
     }
-    
+
     if (filters.isActive !== undefined) {
       where.isActive = filters.isActive;
     }
-    
+
     if (filters.emailVerified !== undefined) {
       where.emailVerified = filters.emailVerified;
     }
-    
+
     if (filters.search) {
       where.OR = [
         { firstName: { contains: filters.search } },
@@ -123,7 +129,7 @@ export class UserRepository extends BaseRepository {
           family: true,
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       }),
       this.prisma.user.count({ where }),
@@ -171,7 +177,11 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async setPasswordResetToken(id: string, token: string, expiresAt: Date): Promise<User> {
+  async setPasswordResetToken(
+    id: string,
+    token: string,
+    expiresAt: Date
+  ): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data: {
@@ -225,10 +235,7 @@ export class UserRepository extends BaseRepository {
         familyId,
         isActive: true,
       },
-      orderBy: [
-        { role: 'asc' },
-        { firstName: 'asc' },
-      ],
+      orderBy: [{ role: "asc" }, { firstName: "asc" }],
     });
   }
 

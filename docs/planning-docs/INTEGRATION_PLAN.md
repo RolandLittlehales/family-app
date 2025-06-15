@@ -1,16 +1,19 @@
 # Database & Authentication Integration Plan
 
 ## Overview
+
 This document outlines how to integrate the database and authentication systems with the existing Family App pages, transforming static mockups into dynamic, data-driven functionality.
 
 ## Current State Analysis
 
 ### Existing Pages
+
 1. **Home Page** (`/`) - Static welcome with navigation cards
 2. **Books Page** (`/books`) - Static mockup with hardcoded stats and feature cards
 3. **Streaming Page** (`/streaming`) - Static mockup with hardcoded stats and service previews
 
 ### Existing Components
+
 - `Header.tsx` - Navigation with TODO comment for theme toggle
 - `PageLayout.tsx` - Layout wrapper
 - `Button.css.ts` - Button variants
@@ -21,6 +24,7 @@ This document outlines how to integrate the database and authentication systems 
 ### 1.1 Layout and Provider Setup
 
 #### Update Root Layout
+
 ```typescript
 // src/app/layout.tsx - UPDATED
 import type { Metadata } from "next";
@@ -51,6 +55,7 @@ export default function RootLayout({
 ```
 
 #### Create Authentication Provider
+
 ```typescript
 // src/components/providers/AuthProvider.tsx - NEW
 "use client"
@@ -74,6 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 ### 1.2 Update Header Component
 
 #### Enhanced Header with Authentication
+
 ```typescript
 // src/components/Header.tsx - UPDATED SECTIONS
 "use client";
@@ -127,7 +133,7 @@ export function Header({
           {status === "loading" && (
             <div className={styles.authLoading}>Loading...</div>
           )}
-          
+
           {status === "unauthenticated" && (
             <button
               className={styles.signInButton}
@@ -136,7 +142,7 @@ export function Header({
               Sign In
             </button>
           )}
-          
+
           {session && (
             <div className={styles.userMenu}>
               <img
@@ -184,6 +190,7 @@ export function Header({
 ### 1.3 Route Protection
 
 #### Create Protected Route Wrapper
+
 ```typescript
 // src/components/auth/ProtectedRoute.tsx - NEW
 "use client"
@@ -235,6 +242,7 @@ export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
 ### 1.4 Update Page Layouts
 
 #### Create Page Layout with Protection
+
 ```typescript
 // src/components/PageLayout.tsx - UPDATED
 import { ReactNode } from "react";
@@ -248,10 +256,10 @@ export interface PageLayoutProps {
   requireAuth?: boolean;
 }
 
-export function PageLayout({ 
-  children, 
+export function PageLayout({
+  children,
   className = "",
-  requireAuth = false 
+  requireAuth = false
 }: PageLayoutProps) {
   const content = (
     <div className={`${styles.layout} ${className}`}>
@@ -279,6 +287,7 @@ export function PageLayout({
 ### 2.1 Database Setup Files
 
 #### Prisma Configuration
+
 ```javascript
 // prisma/schema.prisma - NEW
 generator client {
@@ -294,39 +303,41 @@ datasource db {
 ```
 
 #### Database Connection
+
 ```typescript
 // src/lib/db.ts - NEW
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+  prisma: PrismaClient | undefined;
+};
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 ```
 
 ### 2.2 Data Access Layer
 
 #### Books Service
+
 ```typescript
 // src/lib/services/books.ts - NEW
-import { prisma } from "@/lib/db"
-import { BookStatus } from "@prisma/client"
+import { prisma } from "@/lib/db";
+import { BookStatus } from "@prisma/client";
 
 export interface BookFilters {
-  status?: BookStatus
-  userId?: string
-  familyId: string
-  search?: string
+  status?: BookStatus;
+  userId?: string;
+  familyId: string;
+  search?: string;
 }
 
-export async function getFamilyBooks({ 
-  familyId, 
-  userId, 
-  status, 
-  search 
+export async function getFamilyBooks({
+  familyId,
+  userId,
+  status,
+  search,
 }: BookFilters) {
   const where = {
     familyId,
@@ -335,12 +346,12 @@ export async function getFamilyBooks({
     ...(search && {
       book: {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { author: { contains: search, mode: 'insensitive' } },
+          { title: { contains: search, mode: "insensitive" } },
+          { author: { contains: search, mode: "insensitive" } },
         ],
       },
     }),
-  }
+  };
 
   return prisma.userBook.findMany({
     where,
@@ -350,40 +361,40 @@ export async function getFamilyBooks({
         select: { id: true, name: true, image: true },
       },
     },
-    orderBy: { updatedAt: 'desc' },
-  })
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
 export async function getFamilyBookStats(familyId: string) {
   const [total, currentlyReading, completed, wantToRead] = await Promise.all([
     prisma.userBook.count({ where: { familyId } }),
-    prisma.userBook.count({ 
-      where: { familyId, status: 'CURRENTLY_READING' } 
+    prisma.userBook.count({
+      where: { familyId, status: "CURRENTLY_READING" },
     }),
-    prisma.userBook.count({ 
-      where: { familyId, status: 'COMPLETED' } 
+    prisma.userBook.count({
+      where: { familyId, status: "COMPLETED" },
     }),
-    prisma.userBook.count({ 
-      where: { familyId, status: 'WANT_TO_READ' } 
+    prisma.userBook.count({
+      where: { familyId, status: "WANT_TO_READ" },
     }),
-  ])
+  ]);
 
   return {
     total,
     currentlyReading,
     completed,
     wantToRead,
-  }
+  };
 }
 
 export async function addBookToFamily(
   familyId: string,
   userId: string,
   bookData: {
-    title: string
-    author?: string
-    isbn?: string
-    status: BookStatus
+    title: string;
+    author?: string;
+    isbn?: string;
+    status: BookStatus;
   }
 ) {
   // First, create or find the book
@@ -395,7 +406,7 @@ export async function addBookToFamily(
       author: bookData.author,
       isbn: bookData.isbn,
     },
-  })
+  });
 
   // Then, add it to the user's collection
   return prisma.userBook.create({
@@ -411,30 +422,31 @@ export async function addBookToFamily(
         select: { id: true, name: true, image: true },
       },
     },
-  })
+  });
 }
 ```
 
 #### Media Service
+
 ```typescript
 // src/lib/services/media.ts - NEW
-import { prisma } from "@/lib/db"
-import { MediaStatus, MediaType } from "@prisma/client"
+import { prisma } from "@/lib/db";
+import { MediaStatus, MediaType } from "@prisma/client";
 
 export interface MediaFilters {
-  status?: MediaStatus
-  type?: MediaType
-  userId?: string
-  familyId: string
-  search?: string
+  status?: MediaStatus;
+  type?: MediaType;
+  userId?: string;
+  familyId: string;
+  search?: string;
 }
 
-export async function getFamilyMedia({ 
-  familyId, 
-  userId, 
-  status, 
-  type, 
-  search 
+export async function getFamilyMedia({
+  familyId,
+  userId,
+  status,
+  type,
+  search,
 }: MediaFilters) {
   const where = {
     familyId,
@@ -443,13 +455,13 @@ export async function getFamilyMedia({
     ...(search && {
       media: {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
+          { title: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
         ],
       },
     }),
     ...(type && { media: { type } }),
-  }
+  };
 
   return prisma.userMedia.findMany({
     where,
@@ -459,30 +471,31 @@ export async function getFamilyMedia({
         select: { id: true, name: true, image: true },
       },
     },
-    orderBy: { updatedAt: 'desc' },
-  })
+    orderBy: { updatedAt: "desc" },
+  });
 }
 
 export async function getFamilyMediaStats(familyId: string) {
-  const [watchlist, currentlyWatching, completed, totalShows] = await Promise.all([
-    prisma.userMedia.count({ 
-      where: { familyId, status: 'WANT_TO_WATCH' } 
-    }),
-    prisma.userMedia.count({ 
-      where: { familyId, status: 'CURRENTLY_WATCHING' } 
-    }),
-    prisma.userMedia.count({ 
-      where: { familyId, status: 'COMPLETED' } 
-    }),
-    prisma.userMedia.count({ where: { familyId } }),
-  ])
+  const [watchlist, currentlyWatching, completed, totalShows] =
+    await Promise.all([
+      prisma.userMedia.count({
+        where: { familyId, status: "WANT_TO_WATCH" },
+      }),
+      prisma.userMedia.count({
+        where: { familyId, status: "CURRENTLY_WATCHING" },
+      }),
+      prisma.userMedia.count({
+        where: { familyId, status: "COMPLETED" },
+      }),
+      prisma.userMedia.count({ where: { familyId } }),
+    ]);
 
   return {
     watchlist,
     currentlyWatching,
     completed,
     totalShows,
-  }
+  };
 }
 ```
 
@@ -491,6 +504,7 @@ export async function getFamilyMediaStats(familyId: string) {
 ### 3.1 Transform Books Page
 
 #### Dynamic Books Page
+
 ```typescript
 // src/app/books/page.tsx - UPDATED
 import type { Metadata } from "next";
@@ -510,7 +524,7 @@ export const metadata: Metadata = {
 
 export default async function BooksPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.family) {
     return <div>Please complete family setup</div>;
   }
@@ -541,6 +555,7 @@ export default async function BooksPage() {
 ```
 
 #### Books Stats Component
+
 ```typescript
 // src/components/books/BooksStats.tsx - NEW
 import * as styles from "./BooksStats.css";
@@ -581,6 +596,7 @@ export function BooksStats({ stats }: BooksStatsProps) {
 ### 3.2 Transform Streaming Page
 
 #### Dynamic Streaming Page
+
 ```typescript
 // src/app/streaming/page.tsx - UPDATED
 import type { Metadata } from "next";
@@ -600,7 +616,7 @@ export const metadata: Metadata = {
 
 export default async function StreamingPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.family) {
     return <div>Please complete family setup</div>;
   }
@@ -633,6 +649,7 @@ export default async function StreamingPage() {
 ### 3.3 Transform Home Page
 
 #### Dynamic Home Page
+
 ```typescript
 // src/app/page.tsx - UPDATED
 import { getServerSession } from "next-auth";
@@ -690,26 +707,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.family) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
   const search = searchParams.get("search");
-  
+
   try {
     const books = await getFamilyBooks({
       familyId: session.user.family.id,
       ...(status && { status }),
       ...(search && { search }),
     });
-    
+
     return NextResponse.json(books);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch books" }, 
+      { error: "Failed to fetch books" },
       { status: 500 }
     );
   }
@@ -717,26 +734,23 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.family) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   try {
     const bookData = await request.json();
-    
+
     const book = await addBookToFamily(
       session.user.family.id,
       session.user.id,
       bookData
     );
-    
+
     return NextResponse.json(book, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to add book" }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to add book" }, { status: 500 });
   }
 }
 ```
@@ -744,6 +758,7 @@ export async function POST(request: NextRequest) {
 ## Phase 5: Implementation Timeline
 
 ### Week 1: Authentication Foundation
+
 - [ ] Install and configure NextAuth.js
 - [ ] Set up database with Prisma
 - [ ] Create authentication pages
@@ -751,19 +766,22 @@ export async function POST(request: NextRequest) {
 - [ ] Create ProtectedRoute wrapper
 
 ### Week 2: Database Integration
+
 - [ ] Implement Prisma schema
 - [ ] Create data access services
 - [ ] Set up API routes
 - [ ] Add error handling and validation
 
 ### Week 3: Books Page Transformation
+
 - [ ] Transform Books page to use real data
 - [ ] Create BooksStats component
-- [ ] Create BooksGrid component  
+- [ ] Create BooksGrid component
 - [ ] Add AddBookButton functionality
 - [ ] Implement search and filters
 
 ### Week 4: Streaming Page Transformation
+
 - [ ] Transform Streaming page to use real data
 - [ ] Create StreamingStats component
 - [ ] Create StreamingGrid component
@@ -771,6 +789,7 @@ export async function POST(request: NextRequest) {
 - [ ] Implement watchlist management
 
 ### Week 5: Home Page & Polish
+
 - [ ] Transform Home page for authenticated users
 - [ ] Create family dashboard
 - [ ] Add loading states and error boundaries
@@ -780,6 +799,7 @@ export async function POST(request: NextRequest) {
 ## Testing Strategy
 
 ### Database Testing
+
 ```typescript
 // __tests__/services/books.test.ts
 import { getFamilyBooks, addBookToFamily } from "@/lib/services/books";
@@ -805,6 +825,7 @@ describe("Books Service", () => {
 ```
 
 ### Component Testing
+
 ```typescript
 // __tests__/components/BooksStats.test.tsx
 import { render, screen } from "@testing-library/react";
@@ -820,7 +841,7 @@ describe("BooksStats", () => {
     };
 
     render(<BooksStats stats={stats} />);
-    
+
     expect(screen.getByText("24")).toBeInTheDocument();
     expect(screen.getByText("Total Books")).toBeInTheDocument();
   });

@@ -1,8 +1,8 @@
-import { PrismaClient, UserRole } from '../../../src/generated/prisma';
-import { UserRepository } from '../../../src/lib/repositories/user.repository';
-import bcrypt from 'bcryptjs';
+import { PrismaClient, UserRole } from "../../../src/generated/prisma";
+import { UserRepository } from "../../../src/lib/repositories/user.repository";
+import bcrypt from "bcryptjs";
 
-describe('UserRepository', () => {
+describe("UserRepository", () => {
   let prisma: PrismaClient;
   let userRepository: UserRepository;
 
@@ -10,16 +10,16 @@ describe('UserRepository', () => {
     prisma = new PrismaClient({
       datasources: {
         db: {
-          url: 'file:./test.db',
+          url: "file:./test.db",
         },
       },
     });
-    
+
     userRepository = new UserRepository(prisma);
-    
+
     // Reset database
-    await prisma.$executeRawUnsafe('DELETE FROM users');
-    await prisma.$executeRawUnsafe('DELETE FROM families');
+    await prisma.$executeRawUnsafe("DELETE FROM users");
+    await prisma.$executeRawUnsafe("DELETE FROM families");
   });
 
   afterAll(async () => {
@@ -32,14 +32,14 @@ describe('UserRepository', () => {
     await prisma.family.deleteMany();
   });
 
-  describe('create', () => {
-    it('should create a new user with default role', async () => {
+  describe("create", () => {
+    it("should create a new user with default role", async () => {
       const userData = {
-        email: 'test@example.com',
-        username: 'testuser',
-        firstName: 'Test',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "test@example.com",
+        username: "testuser",
+        firstName: "Test",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       const user = await userRepository.create(userData);
@@ -54,13 +54,13 @@ describe('UserRepository', () => {
       expect(user.emailVerified).toBe(false);
     });
 
-    it('should create a user with specified role', async () => {
+    it("should create a user with specified role", async () => {
       const userData = {
-        email: 'parent@example.com',
-        username: 'parentuser',
-        firstName: 'Parent',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "parent@example.com",
+        username: "parentuser",
+        firstName: "Parent",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
         role: UserRole.PARENT,
       };
 
@@ -69,53 +69,53 @@ describe('UserRepository', () => {
       expect(user.role).toBe(UserRole.PARENT);
     });
 
-    it('should throw error for duplicate email', async () => {
+    it("should throw error for duplicate email", async () => {
       const userData = {
-        email: 'duplicate@example.com',
-        username: 'user1',
-        firstName: 'First',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "duplicate@example.com",
+        username: "user1",
+        firstName: "First",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       await userRepository.create(userData);
 
       const duplicateUserData = {
         ...userData,
-        username: 'user2',
+        username: "user2",
       };
 
       await expect(userRepository.create(duplicateUserData)).rejects.toThrow();
     });
 
-    it('should throw error for duplicate username', async () => {
+    it("should throw error for duplicate username", async () => {
       const userData = {
-        email: 'user1@example.com',
-        username: 'duplicate',
-        firstName: 'First',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "user1@example.com",
+        username: "duplicate",
+        firstName: "First",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       await userRepository.create(userData);
 
       const duplicateUserData = {
         ...userData,
-        email: 'user2@example.com',
+        email: "user2@example.com",
       };
 
       await expect(userRepository.create(duplicateUserData)).rejects.toThrow();
     });
   });
 
-  describe('findById', () => {
-    it('should find user by id', async () => {
+  describe("findById", () => {
+    it("should find user by id", async () => {
       const userData = {
-        email: 'findbyid@example.com',
-        username: 'finduserid',
-        firstName: 'Find',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "findbyid@example.com",
+        username: "finduserid",
+        firstName: "Find",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       const createdUser = await userRepository.create(userData);
@@ -126,20 +126,20 @@ describe('UserRepository', () => {
       expect(foundUser!.email).toBe(userData.email);
     });
 
-    it('should return null for non-existent id', async () => {
-      const foundUser = await userRepository.findById('non-existent-id');
+    it("should return null for non-existent id", async () => {
+      const foundUser = await userRepository.findById("non-existent-id");
       expect(foundUser).toBeNull();
     });
   });
 
-  describe('findByEmail', () => {
-    it('should find user by email', async () => {
+  describe("findByEmail", () => {
+    it("should find user by email", async () => {
       const userData = {
-        email: 'findbyemail@example.com',
-        username: 'finduseremail',
-        firstName: 'Find',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "findbyemail@example.com",
+        username: "finduseremail",
+        firstName: "Find",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       await userRepository.create(userData);
@@ -149,20 +149,22 @@ describe('UserRepository', () => {
       expect(foundUser!.email).toBe(userData.email);
     });
 
-    it('should return null for non-existent email', async () => {
-      const foundUser = await userRepository.findByEmail('nonexistent@example.com');
+    it("should return null for non-existent email", async () => {
+      const foundUser = await userRepository.findByEmail(
+        "nonexistent@example.com"
+      );
       expect(foundUser).toBeNull();
     });
   });
 
-  describe('findByUsername', () => {
-    it('should find user by username', async () => {
+  describe("findByUsername", () => {
+    it("should find user by username", async () => {
       const userData = {
-        email: 'findbyusername@example.com',
-        username: 'finduserusername',
-        firstName: 'Find',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "findbyusername@example.com",
+        username: "finduserusername",
+        firstName: "Find",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       await userRepository.create(userData);
@@ -172,38 +174,38 @@ describe('UserRepository', () => {
       expect(foundUser!.username).toBe(userData.username);
     });
 
-    it('should return null for non-existent username', async () => {
-      const foundUser = await userRepository.findByUsername('nonexistentuser');
+    it("should return null for non-existent username", async () => {
+      const foundUser = await userRepository.findByUsername("nonexistentuser");
       expect(foundUser).toBeNull();
     });
   });
 
-  describe('findMany', () => {
+  describe("findMany", () => {
     beforeEach(async () => {
       // Create test users
       const users = [
         {
-          email: 'user1@example.com',
-          username: 'user1',
-          firstName: 'John',
-          lastName: 'Doe',
-          passwordHash: await bcrypt.hash('password123', 10),
+          email: "user1@example.com",
+          username: "user1",
+          firstName: "John",
+          lastName: "Doe",
+          passwordHash: await bcrypt.hash("password123", 10),
           role: UserRole.PARENT,
         },
         {
-          email: 'user2@example.com',
-          username: 'user2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          passwordHash: await bcrypt.hash('password123', 10),
+          email: "user2@example.com",
+          username: "user2",
+          firstName: "Jane",
+          lastName: "Smith",
+          passwordHash: await bcrypt.hash("password123", 10),
           role: UserRole.CHILD,
         },
         {
-          email: 'user3@example.com',
-          username: 'user3',
-          firstName: 'Bob',
-          lastName: 'Johnson',
-          passwordHash: await bcrypt.hash('password123', 10),
+          email: "user3@example.com",
+          username: "user3",
+          firstName: "Bob",
+          lastName: "Johnson",
+          passwordHash: await bcrypt.hash("password123", 10),
           role: UserRole.CHILD,
           isActive: false,
         },
@@ -214,7 +216,7 @@ describe('UserRepository', () => {
       }
     });
 
-    it('should return all users with pagination', async () => {
+    it("should return all users with pagination", async () => {
       const result = await userRepository.findMany({}, { page: 1, limit: 10 });
 
       expect(result.data).toHaveLength(3);
@@ -223,27 +225,29 @@ describe('UserRepository', () => {
       expect(result.pagination.limit).toBe(10);
     });
 
-    it('should filter by role', async () => {
+    it("should filter by role", async () => {
       const result = await userRepository.findMany({ role: UserRole.CHILD });
 
       expect(result.data).toHaveLength(2);
-      expect(result.data.every(user => user.role === UserRole.CHILD)).toBe(true);
+      expect(result.data.every(user => user.role === UserRole.CHILD)).toBe(
+        true
+      );
     });
 
-    it('should filter by isActive', async () => {
+    it("should filter by isActive", async () => {
       const result = await userRepository.findMany({ isActive: true });
 
       expect(result.data).toHaveLength(2);
       expect(result.data.every(user => user.isActive === true)).toBe(true);
     });
 
-    it('should search by name', async () => {
-      const result = await userRepository.findMany({ search: 'John' });
+    it("should search by name", async () => {
+      const result = await userRepository.findMany({ search: "John" });
 
       expect(result.data).toHaveLength(2); // John Doe and Bob Johnson
     });
 
-    it('should handle pagination correctly', async () => {
+    it("should handle pagination correctly", async () => {
       const page1 = await userRepository.findMany({}, { page: 1, limit: 2 });
       const page2 = await userRepository.findMany({}, { page: 2, limit: 2 });
 
@@ -254,36 +258,36 @@ describe('UserRepository', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update user data', async () => {
+  describe("update", () => {
+    it("should update user data", async () => {
       const userData = {
-        email: 'update@example.com',
-        username: 'updateuser',
-        firstName: 'Update',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "update@example.com",
+        username: "updateuser",
+        firstName: "Update",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       const createdUser = await userRepository.create(userData);
       const updatedUser = await userRepository.update(createdUser.id, {
-        firstName: 'Updated',
-        bio: 'Updated bio',
+        firstName: "Updated",
+        bio: "Updated bio",
       });
 
-      expect(updatedUser.firstName).toBe('Updated');
-      expect(updatedUser.bio).toBe('Updated bio');
-      expect(updatedUser.lastName).toBe('User'); // Should remain unchanged
+      expect(updatedUser.firstName).toBe("Updated");
+      expect(updatedUser.bio).toBe("Updated bio");
+      expect(updatedUser.lastName).toBe("User"); // Should remain unchanged
     });
   });
 
-  describe('delete', () => {
-    it('should delete user', async () => {
+  describe("delete", () => {
+    it("should delete user", async () => {
       const userData = {
-        email: 'delete@example.com',
-        username: 'deleteuser',
-        firstName: 'Delete',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "delete@example.com",
+        username: "deleteuser",
+        firstName: "Delete",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       const createdUser = await userRepository.create(userData);
@@ -294,38 +298,45 @@ describe('UserRepository', () => {
     });
   });
 
-  describe('password and authentication methods', () => {
-    it('should update password and clear reset tokens', async () => {
+  describe("password and authentication methods", () => {
+    it("should update password and clear reset tokens", async () => {
       const userData = {
-        email: 'password@example.com',
-        username: 'passworduser',
-        firstName: 'Password',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('oldpassword', 10),
+        email: "password@example.com",
+        username: "passworduser",
+        firstName: "Password",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("oldpassword", 10),
       };
 
       const user = await userRepository.create(userData);
-      await userRepository.setPasswordResetToken(user.id, 'reset-token', new Date(Date.now() + 3600000));
+      await userRepository.setPasswordResetToken(
+        user.id,
+        "reset-token",
+        new Date(Date.now() + 3600000)
+      );
 
-      const newPasswordHash = await bcrypt.hash('newpassword', 10);
-      const updatedUser = await userRepository.updatePassword(user.id, newPasswordHash);
+      const newPasswordHash = await bcrypt.hash("newpassword", 10);
+      const updatedUser = await userRepository.updatePassword(
+        user.id,
+        newPasswordHash
+      );
 
       expect(updatedUser.passwordHash).toBe(newPasswordHash);
       expect(updatedUser.passwordResetToken).toBeNull();
       expect(updatedUser.passwordResetExpires).toBeNull();
     });
 
-    it('should verify email', async () => {
+    it("should verify email", async () => {
       const userData = {
-        email: 'verify@example.com',
-        username: 'verifyuser',
-        firstName: 'Verify',
-        lastName: 'User',
-        passwordHash: await bcrypt.hash('password123', 10),
+        email: "verify@example.com",
+        username: "verifyuser",
+        firstName: "Verify",
+        lastName: "User",
+        passwordHash: await bcrypt.hash("password123", 10),
       };
 
       const user = await userRepository.create(userData);
-      await userRepository.setEmailVerificationToken(user.id, 'verify-token');
+      await userRepository.setEmailVerificationToken(user.id, "verify-token");
 
       const verifiedUser = await userRepository.verifyEmail(user.id);
 

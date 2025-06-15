@@ -1,5 +1,17 @@
-import { StreamingContent, UserStreamingItem, StreamingStatus, ContentType, Episode, Prisma } from '../../generated/prisma';
-import { BaseRepository, PaginationOptions, PaginatedResult, PaginationHelper } from './base.repository';
+import {
+  StreamingContent,
+  UserStreamingItem,
+  StreamingStatus,
+  ContentType,
+  Episode,
+  Prisma,
+} from "../../generated/prisma";
+import {
+  BaseRepository,
+  PaginationOptions,
+  PaginatedResult,
+  PaginationHelper,
+} from "./base.repository";
 
 export interface CreateStreamingContentData {
   title: string;
@@ -123,14 +135,11 @@ export class StreamingRepository extends BaseRepository {
             },
           },
           orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
           },
         },
         episodes: {
-          orderBy: [
-            { seasonNumber: 'asc' },
-            { episodeNumber: 'asc' },
-          ],
+          orderBy: [{ seasonNumber: "asc" }, { episodeNumber: "asc" }],
         },
         _count: {
           select: {
@@ -147,22 +156,23 @@ export class StreamingRepository extends BaseRepository {
     filters: StreamingContentFilters = {},
     pagination: PaginationOptions = {}
   ): Promise<PaginatedResult<StreamingContent>> {
-    const { page, limit, skip, take } = PaginationHelper.getPaginationParams(pagination);
-    
+    const { page, limit, skip, take } =
+      PaginationHelper.getPaginationParams(pagination);
+
     const where: Prisma.StreamingContentWhereInput = {};
-    
+
     if (filters.familyId) {
       where.familyId = filters.familyId;
     }
-    
+
     if (filters.type) {
       where.type = filters.type;
     }
-    
+
     if (filters.genre) {
       where.genre = { contains: filters.genre };
     }
-    
+
     if (filters.search) {
       where.OR = [
         { title: { contains: filters.search } },
@@ -187,7 +197,7 @@ export class StreamingRepository extends BaseRepository {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       }),
       this.prisma.streamingContent.count({ where }),
@@ -199,7 +209,10 @@ export class StreamingRepository extends BaseRepository {
     };
   }
 
-  async update(id: string, data: UpdateStreamingContentData): Promise<StreamingContent> {
+  async update(
+    id: string,
+    data: UpdateStreamingContentData
+  ): Promise<StreamingContent> {
     return this.prisma.streamingContent.update({
       where: { id },
       data,
@@ -212,7 +225,9 @@ export class StreamingRepository extends BaseRepository {
     });
   }
 
-  async addUserStreamingItem(data: CreateUserStreamingItemData): Promise<UserStreamingItem> {
+  async addUserStreamingItem(
+    data: CreateUserStreamingItemData
+  ): Promise<UserStreamingItem> {
     return this.prisma.userStreamingItem.create({
       data: {
         userId: data.userId,
@@ -268,7 +283,10 @@ export class StreamingRepository extends BaseRepository {
     });
   }
 
-  async removeUserStreamingItem(userId: string, streamingContentId: string): Promise<UserStreamingItem> {
+  async removeUserStreamingItem(
+    userId: string,
+    streamingContentId: string
+  ): Promise<UserStreamingItem> {
     return this.prisma.userStreamingItem.delete({
       where: {
         userId_streamingContentId: {
@@ -279,7 +297,10 @@ export class StreamingRepository extends BaseRepository {
     });
   }
 
-  async findUserStreamingItem(userId: string, streamingContentId: string): Promise<UserStreamingItem | null> {
+  async findUserStreamingItem(
+    userId: string,
+    streamingContentId: string
+  ): Promise<UserStreamingItem | null> {
     return this.prisma.userStreamingItem.findUnique({
       where: {
         userId_streamingContentId: {
@@ -306,12 +327,13 @@ export class StreamingRepository extends BaseRepository {
     status?: StreamingStatus,
     pagination: PaginationOptions = {}
   ): Promise<PaginatedResult<UserStreamingItem>> {
-    const { page, limit, skip, take } = PaginationHelper.getPaginationParams(pagination);
-    
+    const { page, limit, skip, take } =
+      PaginationHelper.getPaginationParams(pagination);
+
     const where: Prisma.UserStreamingItemWhereInput = {
       userId,
     };
-    
+
     if (status) {
       where.status = status;
     }
@@ -325,7 +347,7 @@ export class StreamingRepository extends BaseRepository {
           streamingContent: true,
         },
         orderBy: {
-          updatedAt: 'desc',
+          updatedAt: "desc",
         },
       }),
       this.prisma.userStreamingItem.count({ where }),
@@ -344,7 +366,10 @@ export class StreamingRepository extends BaseRepository {
     return this.findMany({ familyId }, pagination);
   }
 
-  async getPopularStreamingContent(familyId: string, limit: number = 10): Promise<StreamingContent[]> {
+  async getPopularStreamingContent(
+    familyId: string,
+    limit: number = 10
+  ): Promise<StreamingContent[]> {
     return this.prisma.streamingContent.findMany({
       where: {
         familyId,
@@ -358,20 +383,23 @@ export class StreamingRepository extends BaseRepository {
       },
       orderBy: {
         userItems: {
-          _count: 'desc',
+          _count: "desc",
         },
       },
       take: limit,
     });
   }
 
-  async getRecentStreamingContent(familyId: string, limit: number = 10): Promise<StreamingContent[]> {
+  async getRecentStreamingContent(
+    familyId: string,
+    limit: number = 10
+  ): Promise<StreamingContent[]> {
     return this.prisma.streamingContent.findMany({
       where: {
         familyId,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: limit,
     });
@@ -379,28 +407,28 @@ export class StreamingRepository extends BaseRepository {
 
   async getUserStreamingStats(userId: string) {
     const stats = await this.prisma.userStreamingItem.groupBy({
-      by: ['status'],
+      by: ["status"],
       where: { userId },
-      _count: { status: true }
+      _count: { status: true },
     });
-    
+
     const result = {
       watchlist: 0,
       watching: 0,
       completed: 0,
       paused: 0,
       dropped: 0,
-      total: 0
+      total: 0,
     };
-    
+
     stats.forEach(stat => {
       const status = stat.status.toLowerCase() as keyof typeof result;
-      if (status !== 'total' && status in result) {
+      if (status !== "total" && status in result) {
         result[status] = stat._count.status;
         result.total += stat._count.status;
       }
     });
-    
+
     return result;
   }
 
@@ -421,26 +449,30 @@ export class StreamingRepository extends BaseRepository {
       where: {
         streamingContentId,
       },
-      orderBy: [
-        { seasonNumber: 'asc' },
-        { episodeNumber: 'asc' },
-      ],
+      orderBy: [{ seasonNumber: "asc" }, { episodeNumber: "asc" }],
     });
   }
 
-  async getEpisodesBySeason(streamingContentId: string, seasonNumber: number): Promise<Episode[]> {
+  async getEpisodesBySeason(
+    streamingContentId: string,
+    seasonNumber: number
+  ): Promise<Episode[]> {
     return this.prisma.episode.findMany({
       where: {
         streamingContentId,
         seasonNumber,
       },
       orderBy: {
-        episodeNumber: 'asc',
+        episodeNumber: "asc",
       },
     });
   }
 
-  async searchStreamingContent(query: string, familyId?: string, limit: number = 20): Promise<StreamingContent[]> {
+  async searchStreamingContent(
+    query: string,
+    familyId?: string,
+    limit: number = 20
+  ): Promise<StreamingContent[]> {
     const where: Prisma.StreamingContentWhereInput = {
       OR: [
         { title: { contains: query } },
@@ -458,7 +490,7 @@ export class StreamingRepository extends BaseRepository {
       where,
       take: limit,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
