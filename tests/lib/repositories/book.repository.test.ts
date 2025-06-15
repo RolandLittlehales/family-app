@@ -1,10 +1,10 @@
-import { PrismaClient, BookStatus } from '../../../src/generated/prisma';
-import { BookRepository } from '../../../src/lib/repositories/book.repository';
-import { UserRepository } from '../../../src/lib/repositories/user.repository';
-import { FamilyRepository } from '../../../src/lib/repositories/family.repository';
-import bcrypt from 'bcryptjs';
+import { PrismaClient, BookStatus } from "../../../src/generated/prisma";
+import { BookRepository } from "../../../src/lib/repositories/book.repository";
+import { UserRepository } from "../../../src/lib/repositories/user.repository";
+import { FamilyRepository } from "../../../src/lib/repositories/family.repository";
+import bcrypt from "bcryptjs";
 
-describe('BookRepository', () => {
+describe("BookRepository", () => {
   let prisma: PrismaClient;
   let bookRepository: BookRepository;
   let userRepository: UserRepository;
@@ -16,11 +16,11 @@ describe('BookRepository', () => {
     prisma = new PrismaClient({
       datasources: {
         db: {
-          url: 'file:./test.db',
+          url: "file:./test.db",
         },
       },
     });
-    
+
     bookRepository = new BookRepository(prisma);
     userRepository = new UserRepository(prisma);
     familyRepository = new FamilyRepository(prisma);
@@ -40,29 +40,29 @@ describe('BookRepository', () => {
 
     // Create test family and user
     testFamily = await familyRepository.create({
-      name: 'Test Family',
-      inviteCode: 'TEST123',
+      name: "Test Family",
+      inviteCode: "TEST123",
     });
 
     testUser = await userRepository.create({
-      email: 'test@example.com',
-      username: 'testuser',
-      firstName: 'Test',
-      lastName: 'User',
-      passwordHash: await bcrypt.hash('password123', 10),
+      email: "test@example.com",
+      username: "testuser",
+      firstName: "Test",
+      lastName: "User",
+      passwordHash: await bcrypt.hash("password123", 10),
       familyId: testFamily.id,
     });
   });
 
-  describe('create', () => {
-    it('should create a new book', async () => {
+  describe("create", () => {
+    it("should create a new book", async () => {
       const bookData = {
-        title: 'Test Book',
-        author: 'Test Author',
-        isbn: '9781234567890',
-        description: 'A test book',
+        title: "Test Book",
+        author: "Test Author",
+        isbn: "9781234567890",
+        description: "A test book",
         pageCount: 300,
-        genre: 'Fiction',
+        genre: "Fiction",
         familyId: testFamily.id,
       };
 
@@ -75,20 +75,20 @@ describe('BookRepository', () => {
       expect(book.familyId).toBe(testFamily.id);
     });
 
-    it('should throw error for duplicate ISBN', async () => {
+    it("should throw error for duplicate ISBN", async () => {
       const bookData = {
-        title: 'Test Book 1',
-        author: 'Test Author',
-        isbn: '9781234567890',
+        title: "Test Book 1",
+        author: "Test Author",
+        isbn: "9781234567890",
         familyId: testFamily.id,
       };
 
       await bookRepository.create(bookData);
 
       const duplicateBook = {
-        title: 'Test Book 2',
-        author: 'Different Author',
-        isbn: '9781234567890',
+        title: "Test Book 2",
+        author: "Different Author",
+        isbn: "9781234567890",
         familyId: testFamily.id,
       };
 
@@ -96,11 +96,11 @@ describe('BookRepository', () => {
     });
   });
 
-  describe('findById', () => {
-    it('should find book by id with related data', async () => {
+  describe("findById", () => {
+    it("should find book by id with related data", async () => {
       const bookData = {
-        title: 'Find Book',
-        author: 'Find Author',
+        title: "Find Book",
+        author: "Find Author",
         familyId: testFamily.id,
       };
 
@@ -112,18 +112,18 @@ describe('BookRepository', () => {
       expect(foundBook!.familyId).toBe(testFamily.id);
     });
 
-    it('should return null for non-existent id', async () => {
-      const foundBook = await bookRepository.findById('non-existent-id');
+    it("should return null for non-existent id", async () => {
+      const foundBook = await bookRepository.findById("non-existent-id");
       expect(foundBook).toBeNull();
     });
   });
 
-  describe('findByIsbn', () => {
-    it('should find book by ISBN', async () => {
+  describe("findByIsbn", () => {
+    it("should find book by ISBN", async () => {
       const bookData = {
-        title: 'ISBN Book',
-        author: 'ISBN Author',
-        isbn: '9787654321098',
+        title: "ISBN Book",
+        author: "ISBN Author",
+        isbn: "9787654321098",
         familyId: testFamily.id,
       };
 
@@ -135,26 +135,26 @@ describe('BookRepository', () => {
     });
   });
 
-  describe('findMany', () => {
+  describe("findMany", () => {
     beforeEach(async () => {
       // Create test books
       const books = [
         {
-          title: 'Fiction Book',
-          author: 'Fiction Author',
-          genre: 'Fiction',
+          title: "Fiction Book",
+          author: "Fiction Author",
+          genre: "Fiction",
           familyId: testFamily.id,
         },
         {
-          title: 'Science Book',
-          author: 'Science Author',
-          genre: 'Science',
+          title: "Science Book",
+          author: "Science Author",
+          genre: "Science",
           familyId: testFamily.id,
         },
         {
-          title: 'Another Fiction',
-          author: 'Another Author',
-          genre: 'Fiction',
+          title: "Another Fiction",
+          author: "Another Author",
+          genre: "Fiction",
           familyId: testFamily.id,
         },
       ];
@@ -164,46 +164,48 @@ describe('BookRepository', () => {
       }
     });
 
-    it('should return all books with pagination', async () => {
+    it("should return all books with pagination", async () => {
       const result = await bookRepository.findMany({ familyId: testFamily.id });
 
       expect(result.data).toHaveLength(3);
       expect(result.pagination.total).toBe(3);
     });
 
-    it('should filter by genre', async () => {
+    it("should filter by genre", async () => {
       const result = await bookRepository.findMany({
         familyId: testFamily.id,
-        genre: 'Fiction',
+        genre: "Fiction",
       });
 
       expect(result.data).toHaveLength(2);
-      expect(result.data.every(book => book.genre?.includes('Fiction'))).toBe(true);
+      expect(result.data.every(book => book.genre?.includes("Fiction"))).toBe(
+        true
+      );
     });
 
-    it('should search by title', async () => {
+    it("should search by title", async () => {
       const result = await bookRepository.findMany({
         familyId: testFamily.id,
-        search: 'Science',
+        search: "Science",
       });
 
       expect(result.data).toHaveLength(1);
-      expect(result.data[0].title).toBe('Science Book');
+      expect(result.data[0].title).toBe("Science Book");
     });
   });
 
-  describe('User Book operations', () => {
+  describe("User Book operations", () => {
     let testBook: any;
 
     beforeEach(async () => {
       testBook = await bookRepository.create({
-        title: 'User Book Test',
-        author: 'Test Author',
+        title: "User Book Test",
+        author: "Test Author",
         familyId: testFamily.id,
       });
     });
 
-    it('should add book to user library', async () => {
+    it("should add book to user library", async () => {
       const userBookData = {
         userId: testUser.id,
         bookId: testBook.id,
@@ -220,7 +222,7 @@ describe('BookRepository', () => {
       expect(userBook.progress).toBe(50);
     });
 
-    it('should update user book', async () => {
+    it("should update user book", async () => {
       await bookRepository.addUserBook({
         userId: testUser.id,
         bookId: testBook.id,
@@ -243,30 +245,33 @@ describe('BookRepository', () => {
       expect(updatedUserBook.rating).toBe(4.5);
     });
 
-    it('should find user book', async () => {
+    it("should find user book", async () => {
       await bookRepository.addUserBook({
         userId: testUser.id,
         bookId: testBook.id,
         status: BookStatus.WISHLIST,
       });
 
-      const userBook = await bookRepository.findUserBook(testUser.id, testBook.id);
+      const userBook = await bookRepository.findUserBook(
+        testUser.id,
+        testBook.id
+      );
 
       expect(userBook).toBeDefined();
       expect(userBook!.status).toBe(BookStatus.WISHLIST);
     });
 
-    it('should get user books by status', async () => {
+    it("should get user books by status", async () => {
       // Add multiple books with different statuses
       const books = await Promise.all([
         bookRepository.create({
-          title: 'Book 1',
-          author: 'Author 1',
+          title: "Book 1",
+          author: "Author 1",
           familyId: testFamily.id,
         }),
         bookRepository.create({
-          title: 'Book 2',
-          author: 'Author 2',
+          title: "Book 2",
+          author: "Author 2",
           familyId: testFamily.id,
         }),
       ]);
@@ -283,7 +288,10 @@ describe('BookRepository', () => {
         status: BookStatus.COMPLETED,
       });
 
-      const readingBooks = await bookRepository.getUserBooks(testUser.id, BookStatus.READING);
+      const readingBooks = await bookRepository.getUserBooks(
+        testUser.id,
+        BookStatus.READING
+      );
       const allBooks = await bookRepository.getUserBooks(testUser.id);
 
       expect(readingBooks.data).toHaveLength(1);
@@ -291,7 +299,7 @@ describe('BookRepository', () => {
       expect(allBooks.data).toHaveLength(2);
     });
 
-    it('should remove user book', async () => {
+    it("should remove user book", async () => {
       await bookRepository.addUserBook({
         userId: testUser.id,
         bookId: testBook.id,
@@ -300,28 +308,31 @@ describe('BookRepository', () => {
 
       await bookRepository.removeUserBook(testUser.id, testBook.id);
 
-      const userBook = await bookRepository.findUserBook(testUser.id, testBook.id);
+      const userBook = await bookRepository.findUserBook(
+        testUser.id,
+        testBook.id
+      );
       expect(userBook).toBeNull();
     });
   });
 
-  describe('getUserBookStats', () => {
+  describe("getUserBookStats", () => {
     beforeEach(async () => {
       // Create books with different statuses
       const books = await Promise.all([
         bookRepository.create({
-          title: 'Wishlist Book',
-          author: 'Author',
+          title: "Wishlist Book",
+          author: "Author",
           familyId: testFamily.id,
         }),
         bookRepository.create({
-          title: 'Reading Book',
-          author: 'Author',
+          title: "Reading Book",
+          author: "Author",
           familyId: testFamily.id,
         }),
         bookRepository.create({
-          title: 'Completed Book',
-          author: 'Author',
+          title: "Completed Book",
+          author: "Author",
           familyId: testFamily.id,
         }),
       ]);
@@ -345,7 +356,7 @@ describe('BookRepository', () => {
       });
     });
 
-    it('should return correct user book statistics', async () => {
+    it("should return correct user book statistics", async () => {
       const stats = await bookRepository.getUserBookStats(testUser.id);
 
       expect(stats.wishlist).toBe(1);
@@ -357,25 +368,25 @@ describe('BookRepository', () => {
     });
   });
 
-  describe('searchBooks', () => {
+  describe("searchBooks", () => {
     beforeEach(async () => {
       const books = [
         {
-          title: 'Harry Potter',
-          author: 'J.K. Rowling',
-          genre: 'Fantasy',
+          title: "Harry Potter",
+          author: "J.K. Rowling",
+          genre: "Fantasy",
           familyId: testFamily.id,
         },
         {
-          title: 'The Hobbit',
-          author: 'J.R.R. Tolkien',
-          genre: 'Fantasy',
+          title: "The Hobbit",
+          author: "J.R.R. Tolkien",
+          genre: "Fantasy",
           familyId: testFamily.id,
         },
         {
-          title: 'Dune',
-          author: 'Frank Herbert',
-          genre: 'Science Fiction',
+          title: "Dune",
+          author: "Frank Herbert",
+          genre: "Science Fiction",
           familyId: testFamily.id,
         },
       ];
@@ -385,22 +396,28 @@ describe('BookRepository', () => {
       }
     });
 
-    it('should search books by title', async () => {
-      const results = await bookRepository.searchBooks('Harry', testFamily.id);
+    it("should search books by title", async () => {
+      const results = await bookRepository.searchBooks("Harry", testFamily.id);
 
       expect(results).toHaveLength(1);
-      expect(results[0].title).toBe('Harry Potter');
+      expect(results[0].title).toBe("Harry Potter");
     });
 
-    it('should search books by author', async () => {
-      const results = await bookRepository.searchBooks('Tolkien', testFamily.id);
+    it("should search books by author", async () => {
+      const results = await bookRepository.searchBooks(
+        "Tolkien",
+        testFamily.id
+      );
 
       expect(results).toHaveLength(1);
-      expect(results[0].author).toBe('J.R.R. Tolkien');
+      expect(results[0].author).toBe("J.R.R. Tolkien");
     });
 
-    it('should search books by genre', async () => {
-      const results = await bookRepository.searchBooks('Fantasy', testFamily.id);
+    it("should search books by genre", async () => {
+      const results = await bookRepository.searchBooks(
+        "Fantasy",
+        testFamily.id
+      );
 
       expect(results).toHaveLength(2);
     });

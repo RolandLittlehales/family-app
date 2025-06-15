@@ -1,5 +1,10 @@
-import { Family, Prisma } from '../../generated/prisma';
-import { BaseRepository, PaginationOptions, PaginatedResult, PaginationHelper } from './base.repository';
+import { Family, Prisma } from "../../generated/prisma";
+import {
+  BaseRepository,
+  PaginationOptions,
+  PaginatedResult,
+  PaginationHelper,
+} from "./base.repository";
 
 export interface CreateFamilyData {
   name: string;
@@ -50,10 +55,7 @@ export class FamilyRepository extends BaseRepository {
             isActive: true,
             createdAt: true,
           },
-          orderBy: [
-            { role: 'asc' },
-            { firstName: 'asc' },
-          ],
+          orderBy: [{ role: "asc" }, { firstName: "asc" }],
         },
         _count: {
           select: {
@@ -93,14 +95,15 @@ export class FamilyRepository extends BaseRepository {
     filters: FamilyFilters = {},
     pagination: PaginationOptions = {}
   ): Promise<PaginatedResult<Family>> {
-    const { page, limit, skip, take } = PaginationHelper.getPaginationParams(pagination);
-    
+    const { page, limit, skip, take } =
+      PaginationHelper.getPaginationParams(pagination);
+
     const where: Prisma.FamilyWhereInput = {};
-    
+
     if (filters.isPrivate !== undefined) {
       where.isPrivate = filters.isPrivate;
     }
-    
+
     if (filters.search) {
       where.OR = [
         { name: { contains: filters.search } },
@@ -123,7 +126,7 @@ export class FamilyRepository extends BaseRepository {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       }),
       this.prisma.family.count({ where }),
@@ -195,7 +198,7 @@ export class FamilyRepository extends BaseRepository {
     });
 
     if (!family) return false;
-    
+
     return family._count.members < family.maxMembers;
   }
 
@@ -207,7 +210,9 @@ export class FamilyRepository extends BaseRepository {
 
     do {
       if (attempts >= maxAttempts) {
-        throw new Error('Unable to generate unique invite code after maximum attempts');
+        throw new Error(
+          "Unable to generate unique invite code after maximum attempts"
+        );
       }
       inviteCode = this.generateInviteCode();
       const existing = await this.prisma.family.findUnique({
@@ -221,8 +226,8 @@ export class FamilyRepository extends BaseRepository {
   }
 
   private generateInviteCode(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
     for (let i = 0; i < 8; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -230,23 +235,24 @@ export class FamilyRepository extends BaseRepository {
   }
 
   async getFamilyStats(id: string) {
-    const [membersCount, booksCount, streamingCount, activitiesCount] = await Promise.all([
-      this.prisma.user.count({
-        where: {
-          familyId: id,
-          isActive: true,
-        },
-      }),
-      this.prisma.book.count({
-        where: { familyId: id },
-      }),
-      this.prisma.streamingContent.count({
-        where: { familyId: id },
-      }),
-      this.prisma.activity.count({
-        where: { familyId: id },
-      }),
-    ]);
+    const [membersCount, booksCount, streamingCount, activitiesCount] =
+      await Promise.all([
+        this.prisma.user.count({
+          where: {
+            familyId: id,
+            isActive: true,
+          },
+        }),
+        this.prisma.book.count({
+          where: { familyId: id },
+        }),
+        this.prisma.streamingContent.count({
+          where: { familyId: id },
+        }),
+        this.prisma.activity.count({
+          where: { familyId: id },
+        }),
+      ]);
 
     return {
       totalMembers: membersCount,
@@ -274,7 +280,7 @@ export class FamilyRepository extends BaseRepository {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: limit,
     });

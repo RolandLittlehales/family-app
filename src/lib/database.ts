@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient } from "../generated/prisma";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -6,7 +6,10 @@ const globalForPrisma = globalThis as unknown as {
 
 const createPrismaClient = () => {
   return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
     datasources: {
       db: {
         url: process.env.DATABASE_URL,
@@ -17,7 +20,7 @@ const createPrismaClient = () => {
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export const dbHealthCheck = async (): Promise<boolean> => {
   try {
@@ -25,7 +28,7 @@ export const dbHealthCheck = async (): Promise<boolean> => {
     return true;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Database health check failed:', error);
+    console.error("Database health check failed:", error);
     return false;
   }
 };
