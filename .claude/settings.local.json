@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue edit:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma init:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(git add:*)",
+      "Bash(git restore:*)",
+      "Bash(git rm:*)",
+      "Bash(true)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}

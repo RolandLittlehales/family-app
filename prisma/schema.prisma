@@ -1,0 +1,445 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  PARENT
+  CHILD
+}
+
+enum BookStatus {
+  WISHLIST
+  READING
+  COMPLETED
+  PAUSED
+  ABANDONED
+}
+
+enum StreamingStatus {
+  WATCHLIST
+  WATCHING
+  COMPLETED
+  PAUSED
+  DROPPED
+}
+
+enum ContentType {
+  MOVIE
+  TV_SERIES
+  DOCUMENTARY
+  ANIME
+}
+
+enum ReadingGoalType {
+  PAGES
+  BOOKS
+  MINUTES
+}
+
+enum StreamingGoalType {
+  EPISODES
+  MOVIES
+  HOURS
+}
+
+// Core Models
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime?
+  profilePicture String?
+  bio         String?
+  role        UserRole @default(CHILD)
+  isActive    Boolean  @default(true)
+  
+  // Authentication
+  passwordHash String
+  emailVerified Boolean @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  
+  // Family relationships
+  familyId    String?
+  family      Family?  @relation(fields: [familyId], references: [id], onDelete: SetNull)
+  
+  // Books
+  books       UserBook[]
+  bookReviews BookReview[]
+  readingGoals ReadingGoal[]
+  readingSessions ReadingSession[]
+  
+  // Streaming
+  streamingItems UserStreamingItem[]
+  streamingReviews StreamingReview[]
+  streamingGoals StreamingGoal[]
+  watchingSessions WatchingSession[]
+  
+  // Activity
+  activities  Activity[]
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
+  
+  @@map("users")
+  @@index([familyId])
+  @@index([role, isActive])
+}
+
+model Family {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  inviteCode  String   @unique
+  
+  // Settings
+  isPrivate   Boolean  @default(false)
+  maxMembers  Int      @default(10)
+  
+  // Relationships
+  members     User[]
+  books       Book[]
+  streamingContent StreamingContent[]
+  activities  Activity[]
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("families")
+}
+
+// Books Domain
+model Book {
+  id           String   @id @default(cuid())
+  title        String
+  author       String
+  isbn         String?  @unique
+  description  String?
+  publishedDate DateTime?
+  pageCount    Int?
+  language     String?
+  publisher    String?
+  genre        String?
+  coverImage   String?
+  
+  // External IDs
+  googleBooksId String?
+  openLibraryId String?
+  
+  // Family context
+  familyId     String
+  family       Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  
+  // User relationships
+  userBooks    UserBook[]
+  reviews      BookReview[]
+  readingSessions ReadingSession[]
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("books")
+  @@index([title])
+  @@index([author])
+  @@index([genre])
+  @@index([familyId])
+}
+
+model UserBook {
+  id         String     @id @default(cuid())
+  userId     String
+  bookId     String
+  status     BookStatus @default(WISHLIST)
+  rating     Float?     // 1.0 to 5.0
+  progress   Int        @default(0) // pages read
+  startDate  DateTime?
+  endDate    DateTime?
+  notes      String?
+  isFavorite Boolean    @default(false)
+  
+  // Relationships
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book       Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  
+  @@unique([userId, bookId])
+  @@map("user_books")
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([bookId])
+  @@index([userId, updatedAt])
+}
+
+model BookReview {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  rating    Float    // 1.0 to 5.0
+  title     String?
+  content   String
+  isPublic  Boolean  @default(true)
+  
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, bookId])
+  @@map("book_reviews")
+}
+
+model ReadingGoal {
+  id          String          @id @default(cuid())
+  userId      String
+  year        Int
+  type        ReadingGoalType
+  target      Int
+  current     Int             @default(0)
+  isCompleted Boolean         @default(false)
+  
+  // Relationships
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  @@unique([userId, year, type])
+  @@map("reading_goals")
+}
+
+model ReadingSession {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  startPage Int
+  endPage   Int
+  duration  Int      // minutes
+  date      DateTime
+  notes     String?
+  
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  
+  @@map("reading_sessions")
+  @@index([userId, date])
+  @@index([bookId, date])
+}
+
+// Streaming Domain
+model StreamingContent {
+  id           String   @id @default(cuid())
+  title        String
+  type         ContentType
+  description  String?
+  releaseDate  DateTime?
+  runtime      Int?     // minutes for movies, avg episode length for series
+  genre        String?
+  director     String?
+  cast         String?  // JSON string of cast array
+  posterImage  String?
+  backdropImage String?
+  
+  // External IDs
+  tmdbId       String?
+  imdbId       String?
+  
+  // Series specific
+  totalSeasons Int?
+  totalEpisodes Int?
+  
+  // Family context
+  familyId     String
+  family       Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  
+  // User relationships
+  userItems    UserStreamingItem[]
+  reviews      StreamingReview[]
+  episodes     Episode[]
+  watchingSessions WatchingSession[]
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("streaming_content")
+  @@index([title])
+  @@index([type])
+  @@index([genre])
+  @@index([familyId])
+  @@index([familyId, type])
+}
+
+model Episode {
+  id              String           @id @default(cuid())
+  streamingContentId String
+  seasonNumber    Int
+  episodeNumber   Int
+  title           String
+  description     String?
+  airDate         DateTime?
+  runtime         Int?             // minutes
+  stillImage      String?
+  
+  // Relationships
+  streamingContent StreamingContent @relation(fields: [streamingContentId], references: [id], onDelete: Cascade)
+  watchingSessions WatchingSession[]
+  
+  // Timestamps
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  @@unique([streamingContentId, seasonNumber, episodeNumber])
+  @@map("episodes")
+}
+
+model UserStreamingItem {
+  id                String          @id @default(cuid())
+  userId            String
+  streamingContentId String
+  status            StreamingStatus @default(WATCHLIST)
+  rating            Float?          // 1.0 to 5.0
+  progress          Int             @default(0) // episodes watched or movie percentage
+  currentSeason     Int?
+  currentEpisode    Int?
+  startDate         DateTime?
+  endDate           DateTime?
+  notes             String?
+  isFavorite        Boolean         @default(false)
+  
+  // Relationships
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  streamingContent  StreamingContent @relation(fields: [streamingContentId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  @@unique([userId, streamingContentId])
+  @@map("user_streaming_items")
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([streamingContentId])
+  @@index([userId, updatedAt])
+}
+
+model StreamingReview {
+  id                String           @id @default(cuid())
+  userId            String
+  streamingContentId String
+  rating            Float            // 1.0 to 5.0
+  title             String?
+  content           String
+  isPublic          Boolean          @default(true)
+  
+  // Relationships
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  streamingContent  StreamingContent @relation(fields: [streamingContentId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  @@unique([userId, streamingContentId])
+  @@map("streaming_reviews")
+}
+
+model StreamingGoal {
+  id          String            @id @default(cuid())
+  userId      String
+  year        Int
+  type        StreamingGoalType
+  target      Int
+  current     Int               @default(0)
+  isCompleted Boolean           @default(false)
+  
+  // Relationships
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  @@unique([userId, year, type])
+  @@map("streaming_goals")
+}
+
+model WatchingSession {
+  id                String           @id @default(cuid())
+  userId            String
+  streamingContentId String?
+  episodeId         String?
+  duration          Int              // minutes watched
+  date              DateTime
+  notes             String?
+  
+  // Relationships
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  streamingContent  StreamingContent? @relation(fields: [streamingContentId], references: [id], onDelete: Cascade)
+  episode           Episode?         @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt         DateTime         @default(now())
+  
+  @@map("watching_sessions")
+  @@index([userId, date])
+  @@index([streamingContentId, date])
+}
+
+// Activity Tracking
+model Activity {
+  id          String   @id @default(cuid())
+  userId      String
+  familyId    String?
+  type        String   // "book_added", "book_completed", "show_started", etc.
+  title       String
+  description String?
+  metadata    String?  // JSON string for additional data
+  isPublic    Boolean  @default(true)
+  
+  // Relationships
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  family      Family?  @relation(fields: [familyId], references: [id], onDelete: SetNull)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@map("activities")
+  @@index([userId])
+  @@index([familyId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([familyId, createdAt])
+}
