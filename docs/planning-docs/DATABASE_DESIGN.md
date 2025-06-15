@@ -3,13 +3,16 @@
 ## Technology Stack Recommendation
 
 ### Primary Option: PostgreSQL + Prisma ORM
-**Rationale**: 
+
+**Rationale**:
+
 - PostgreSQL offers robust relational features needed for family relationships
 - Prisma provides excellent TypeScript integration and type safety
 - Supports both local development and production deployment
 - Built-in migration system and schema management
 
 ### Alternative Options:
+
 1. **Supabase** (PostgreSQL + Auth + Real-time)
 2. **SQLite + Prisma** (for simpler deployment)
 3. **PlanetScale + Prisma** (for serverless scaling)
@@ -19,6 +22,7 @@
 ### Core Tables
 
 #### 1. Users Table
+
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -34,6 +38,7 @@ CREATE TABLE users (
 ```
 
 #### 2. Families Table
+
 ```sql
 CREATE TABLE families (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -46,6 +51,7 @@ CREATE TABLE families (
 ```
 
 #### 3. Family Members Table (Junction)
+
 ```sql
 CREATE TABLE family_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -60,6 +66,7 @@ CREATE TABLE family_members (
 ### Books Domain Tables
 
 #### 4. Books Table
+
 ```sql
 CREATE TABLE books (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -80,7 +87,7 @@ CREATE TABLE books (
   publisher VARCHAR(255),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   -- Note: Indexes moved to separate CREATE INDEX statements below
 );
 
@@ -92,6 +99,7 @@ CREATE INDEX idx_books_isbn13 ON books(isbn13);
 ```
 
 #### 5. User Books Table (Reading Status)
+
 ```sql
 CREATE TABLE user_books (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -109,7 +117,7 @@ CREATE TABLE user_books (
   private BOOLEAN DEFAULT FALSE, -- whether this is visible to other family members
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(user_id, book_id)
 );
 
@@ -121,6 +129,7 @@ CREATE INDEX idx_user_books_rating ON user_books(rating);
 ```
 
 #### 6. Reading Sessions Table (For Progress Tracking)
+
 ```sql
 CREATE TABLE reading_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -137,6 +146,7 @@ CREATE TABLE reading_sessions (
 ### Movies/TV Domain Tables
 
 #### 7. Movies/Shows Table
+
 ```sql
 CREATE TABLE media (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -161,7 +171,7 @@ CREATE TABLE media (
   status VARCHAR(50), -- 'ended', 'ongoing', 'cancelled'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   -- Note: Indexes moved to separate CREATE INDEX statements below
 );
 
@@ -172,6 +182,7 @@ CREATE INDEX idx_media_tmdb ON media(tmdb_id);
 ```
 
 #### 8. User Media Table (Watching Status)
+
 ```sql
 CREATE TABLE user_media (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -192,7 +203,7 @@ CREATE TABLE user_media (
   watch_priority INTEGER DEFAULT 3, -- 1 (high) to 5 (low)
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(user_id, media_id)
 );
 
@@ -204,6 +215,7 @@ CREATE INDEX idx_user_media_priority ON user_media(watch_priority);
 ```
 
 #### 9. Streaming Services Table
+
 ```sql
 CREATE TABLE streaming_services (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -225,6 +237,7 @@ INSERT INTO streaming_services (name, logo_url, website_url, color_hex) VALUES
 ```
 
 #### 10. Family Streaming Subscriptions Table
+
 ```sql
 CREATE TABLE family_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -238,12 +251,13 @@ CREATE TABLE family_subscriptions (
   notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(family_id, service_id)
 );
 ```
 
 #### 11. Media Availability Table (Where to Watch)
+
 ```sql
 CREATE TABLE media_availability (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -254,7 +268,7 @@ CREATE TABLE media_availability (
   rental_price DECIMAL(6,2), -- if available for rent
   purchase_price DECIMAL(6,2), -- if available for purchase
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(media_id, service_id)
 );
 
@@ -267,6 +281,7 @@ CREATE INDEX idx_availability_until ON media_availability(available_until);
 ### Shared Features Tables
 
 #### 12. Tags Table (For Books and Media)
+
 ```sql
 CREATE TABLE tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -274,13 +289,14 @@ CREATE TABLE tags (
   name VARCHAR(100) NOT NULL,
   color_hex VARCHAR(7) DEFAULT '#6B7280',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(family_id, name),
   INDEX idx_tags_family ON tags(family_id)
 );
 ```
 
 #### 13. Item Tags Table (Junction for Books/Media Tags)
+
 ```sql
 CREATE TABLE item_tags (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -288,7 +304,7 @@ CREATE TABLE item_tags (
   book_id UUID REFERENCES books(id) ON DELETE CASCADE,
   media_id UUID REFERENCES media(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   CHECK ((book_id IS NOT NULL AND media_id IS NULL) OR (book_id IS NULL AND media_id IS NOT NULL)),
   UNIQUE(tag_id, book_id),
   UNIQUE(tag_id, media_id)
@@ -296,6 +312,7 @@ CREATE TABLE item_tags (
 ```
 
 #### 14. Activity Log Table (For Family Activity Feed)
+
 ```sql
 CREATE TABLE activity_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -306,7 +323,7 @@ CREATE TABLE activity_log (
   entity_id UUID NOT NULL, -- references books.id or media.id
   metadata JSONB DEFAULT '{}', -- flexible data like rating, review snippet, etc.
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   INDEX idx_activity_family ON activity_log(family_id),
   INDEX idx_activity_user ON activity_log(user_id),
   INDEX idx_activity_type ON activity_log(action_type),
@@ -315,6 +332,7 @@ CREATE TABLE activity_log (
 ```
 
 #### 15. Family Goals Table
+
 ```sql
 CREATE TABLE family_goals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -334,6 +352,7 @@ CREATE TABLE family_goals (
 ```
 
 #### 16. Goal Progress Table
+
 ```sql
 CREATE TABLE goal_progress (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -341,7 +360,7 @@ CREATE TABLE goal_progress (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   current_value INTEGER DEFAULT 0,
   last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(goal_id, user_id)
 );
 ```
@@ -349,6 +368,7 @@ CREATE TABLE goal_progress (
 ### Authentication & Security Tables
 
 #### 17. Family Invitations Table
+
 ```sql
 CREATE TABLE family_invitations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -359,7 +379,7 @@ CREATE TABLE family_invitations (
   expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
   used_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   INDEX idx_invitations_token ON family_invitations(token),
   INDEX idx_invitations_email ON family_invitations(email),
   INDEX idx_invitations_expires ON family_invitations(expires_at)
@@ -367,6 +387,7 @@ CREATE TABLE family_invitations (
 ```
 
 #### 18. User Sessions Table (For NextAuth)
+
 ```sql
 CREATE TABLE user_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -374,13 +395,14 @@ CREATE TABLE user_sessions (
   session_token VARCHAR(255) NOT NULL UNIQUE,
   expires TIMESTAMP WITH TIME ZONE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   INDEX idx_sessions_token ON user_sessions(session_token),
   INDEX idx_sessions_expires ON user_sessions(expires)
 );
 ```
 
 #### 19. OAuth Accounts Table (For NextAuth)
+
 ```sql
 CREATE TABLE accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -396,13 +418,14 @@ CREATE TABLE accounts (
   id_token TEXT,
   session_state TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(provider, provider_account_id),
   INDEX idx_accounts_user ON accounts(user_id)
 );
 ```
 
 #### 20. Content Ratings & Parental Controls
+
 ```sql
 CREATE TABLE content_ratings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -413,7 +436,7 @@ CREATE TABLE content_ratings (
   reason TEXT,
   created_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
+
   UNIQUE(family_id, content_type, content_id),
   INDEX idx_content_ratings_family ON content_ratings(family_id),
   INDEX idx_content_ratings_age ON content_ratings(min_age)
@@ -567,6 +590,7 @@ model ReadingSession {
 ## Database Indexes Strategy
 
 ### Performance-Critical Indexes
+
 1. **User lookup**: `users(email)` - for authentication
 2. **Family queries**: `family_members(family_id, user_id)` - for authorization
 3. **Books search**: `books(title, author, isbn)`
@@ -574,6 +598,7 @@ model ReadingSession {
 5. **Activity feed**: `activity_log(family_id, created_at DESC)`
 
 ### Composite Indexes for Common Queries
+
 ```sql
 -- Find all books for a family member by status
 CREATE INDEX idx_user_books_user_status ON user_books(user_id, status);
@@ -591,21 +616,25 @@ CREATE INDEX idx_books_search ON books(title, author, genre);
 ## Data Migration Strategy
 
 ### Phase 1: Core Setup
+
 1. Create `users`, `families`, `family_members` tables
 2. Set up authentication system
 3. Create basic user management
 
 ### Phase 2: Books Domain
+
 1. Create `books`, `user_books`, `reading_sessions` tables
 2. Migrate existing static book data
 3. Implement book CRUD operations
 
 ### Phase 3: Media Domain
+
 1. Create `media`, `user_media`, `streaming_services` tables
 2. Seed streaming services data
 3. Implement watchlist functionality
 
 ### Phase 4: Advanced Features
+
 1. Create `tags`, `activity_log`, `goals` tables
 2. Implement family features
 3. Add analytics and reporting
@@ -613,24 +642,27 @@ CREATE INDEX idx_books_search ON books(title, author, genre);
 ## Security Considerations
 
 ### Row Level Security (RLS)
+
 ```sql
 -- Example: Users can only see their own family's data
 ALTER TABLE user_books ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY user_books_family_policy ON user_books
   USING (family_id IN (
-    SELECT family_id FROM family_members 
+    SELECT family_id FROM family_members
     WHERE user_id = auth.uid()
   ));
 ```
 
 ### Data Privacy
+
 - Family members can mark items as `private`
 - Child accounts have restricted access
 - Admin users can manage family settings
 - Data export capabilities for user privacy compliance
 
 ### Performance Monitoring
+
 - Monitor slow queries with `pg_stat_statements`
 - Set up connection pooling (PgBouncer)
 - Implement read replicas for analytics queries

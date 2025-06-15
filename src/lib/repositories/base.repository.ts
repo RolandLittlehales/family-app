@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../generated/prisma';
+import { PrismaClient } from "../../generated/prisma";
 
 export abstract class BaseRepository {
   constructor(protected prisma: PrismaClient) {}
@@ -22,7 +22,11 @@ export interface PaginatedResult<T> {
 }
 
 export class PaginationHelper {
-  static calculatePagination(page: number = 1, limit: number = 10, total: number) {
+  static calculatePagination(
+    page: number = 1,
+    limit: number = 10,
+    total: number
+  ) {
     const totalPages = Math.ceil(total / limit);
     const hasNext = page < totalPages;
     const hasPrev = page > 1;

@@ -1,11 +1,13 @@
 # Mock Implementation Examples
 
 ## Overview
+
 This document provides concrete implementation examples and configuration files for the database and authentication system. These examples can be used as templates for the actual implementation.
 
 ## 1. Environment Configuration
 
 ### .env.local Example
+
 ```bash
 # Database
 DATABASE_URL="postgresql://username:password@localhost:5432/family_app_dev"
@@ -31,6 +33,7 @@ UPSTASH_REDIS_REST_TOKEN=""
 ```
 
 ### .env.production Example
+
 ```bash
 # Production Database (e.g., Railway, Supabase, PlanetScale)
 DATABASE_URL="postgresql://username:password@host:5432/family_app_prod"
@@ -54,6 +57,7 @@ EMAIL_FROM="noreply@your-domain.com"
 ## 2. Prisma Schema Implementation
 
 ### Complete Prisma Schema
+
 ```prisma
 // prisma/schema.prisma
 generator client {
@@ -459,35 +463,36 @@ model GoalProgress {
 ## 3. NextAuth Configuration
 
 ### Complete Auth Configuration
+
 ```typescript
 // src/lib/auth.ts
-import { NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import GoogleProvider from "next-auth/providers/google"
-import EmailProvider from "next-auth/providers/email"
-import { prisma } from "./db"
+import { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import GoogleProvider from "next-auth/providers/google";
+import EmailProvider from "next-auth/providers/email";
+import { prisma } from "./db";
 
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string
-      name?: string | null
-      email?: string | null
-      image?: string | null
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
       family?: {
-        id: string
-        name: string
-        role: string
-      } | null
-    }
+        id: string;
+        name: string;
+        role: string;
+      } | null;
+    };
   }
-  
+
   interface User {
     family?: {
-      id: string
-      name: string
-      role: string
-    } | null
+      id: string;
+      name: string;
+      role: string;
+    } | null;
   }
 }
 
@@ -513,34 +518,34 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
-        session.user.id = user.id
-        
+        session.user.id = user.id;
+
         // Get family information
         const familyMember = await prisma.familyMember.findFirst({
           where: { userId: user.id },
           include: { family: true },
-        })
-        
+        });
+
         if (familyMember) {
           session.user.family = {
             id: familyMember.family.id,
             name: familyMember.family.name,
             role: familyMember.role,
-          }
+          };
         }
       }
-      
-      return session
+
+      return session;
     },
     async signIn({ user, account, profile, email, credentials }) {
       // Allow sign in
-      return true
+      return true;
     },
     async redirect({ url, baseUrl }) {
       // Redirect to dashboard after sign in
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl + "/dashboard"
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl + "/dashboard";
     },
   },
   pages: {
@@ -556,75 +561,80 @@ export const authOptions: NextAuthOptions = {
   events: {
     async signIn({ user, account, profile, isNewUser }) {
       if (isNewUser) {
-        console.log(`New user registered: ${user.email}`)
+        console.log(`New user registered: ${user.email}`);
         // You could trigger welcome email here
       }
     },
     async createUser({ user }) {
-      console.log(`User created: ${user.email}`)
+      console.log(`User created: ${user.email}`);
     },
   },
-}
+};
 ```
 
 ### API Route
+
 ```typescript
 // src/app/api/auth/[...nextauth]/route.ts
-import { authOptions } from "@/lib/auth"
-import NextAuth from "next-auth"
+import { authOptions } from "@/lib/auth";
+import NextAuth from "next-auth";
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
 ```
 
 ## 4. Database Connection
 
 ### Prisma Client Setup
+
 ```typescript
 // src/lib/db.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+  prisma: PrismaClient | undefined;
+};
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: ['query'],
-})
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: ["query"],
+  });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 ```
 
 ## 5. Data Services Examples
 
 ### Books Service
+
 ```typescript
 // src/lib/services/books.ts
-import { prisma } from "@/lib/db"
-import { BookStatus, Prisma } from "@prisma/client"
+import { prisma } from "@/lib/db";
+import { BookStatus, Prisma } from "@prisma/client";
 
 export interface CreateBookData {
-  title: string
-  author?: string
-  isbn?: string
-  description?: string
-  pageCount?: number
-  publishedDate?: Date
-  coverImageUrl?: string
-  genre?: string
-  categories?: string[]
+  title: string;
+  author?: string;
+  isbn?: string;
+  description?: string;
+  pageCount?: number;
+  publishedDate?: Date;
+  coverImageUrl?: string;
+  genre?: string;
+  categories?: string[];
 }
 
 export interface CreateUserBookData {
-  status: BookStatus
-  rating?: number
-  review?: string
-  notes?: string
-  currentPage?: number
-  startDate?: Date
-  favorite?: boolean
-  private?: boolean
+  status: BookStatus;
+  rating?: number;
+  review?: string;
+  notes?: string;
+  currentPage?: number;
+  startDate?: Date;
+  favorite?: boolean;
+  private?: boolean;
 }
 
 export async function createBookWithUserBook(
@@ -634,73 +644,73 @@ export async function createBookWithUserBook(
   userBookData: CreateUserBookData
 ) {
   try {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async tx => {
       // First, try to find existing book by ISBN or title+author
-      let book = null
-      
+      let book = null;
+
       if (bookData.isbn) {
         book = await tx.book.findUnique({
-          where: { isbn: bookData.isbn }
-        })
+          where: { isbn: bookData.isbn },
+        });
       }
-      
+
       if (!book && bookData.title && bookData.author) {
         book = await tx.book.findFirst({
           where: {
-            title: { equals: bookData.title, mode: 'insensitive' },
-            author: { equals: bookData.author, mode: 'insensitive' }
-          }
-        })
+            title: { equals: bookData.title, mode: "insensitive" },
+            author: { equals: bookData.author, mode: "insensitive" },
+          },
+        });
       }
-      
+
       // Create book if it doesn't exist
       if (!book) {
         book = await tx.book.create({
-          data: bookData
-        })
+          data: bookData,
+        });
       }
-      
+
       // Create user book entry
       const userBook = await tx.userBook.create({
         data: {
           userId,
           bookId: book.id,
           familyId,
-          ...userBookData
+          ...userBookData,
         },
         include: {
           book: true,
           user: {
-            select: { id: true, name: true, image: true }
-          }
-        }
-      })
-      
+            select: { id: true, name: true, image: true },
+          },
+        },
+      });
+
       // Log activity
       await tx.activityLog.create({
         data: {
           familyId,
           userId,
-          actionType: 'book_added',
-          entityType: 'book',
+          actionType: "book_added",
+          entityType: "book",
           entityId: book.id,
           metadata: {
             title: book.title,
             status: userBookData.status,
-            rating: userBookData.rating
-          }
-        }
-      })
-      
-      return userBook
-    })
+            rating: userBookData.rating,
+          },
+        },
+      });
+
+      return userBook;
+    });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') {
-        throw new Error('You have already added this book to your collection')
+      if (error.code === "P2002") {
+        throw new Error("You have already added this book to your collection");
       }
     }
-    throw error
+    throw error;
   }
 }
 
@@ -709,59 +719,60 @@ export async function updateUserBookStatus(
   userId: string,
   status: BookStatus,
   additionalData?: {
-    rating?: number
-    review?: string
-    finishDate?: Date
-    currentPage?: number
+    rating?: number;
+    review?: string;
+    finishDate?: Date;
+    currentPage?: number;
   }
 ) {
   const userBook = await prisma.userBook.findFirst({
     where: {
       id: userBookId,
-      userId // Ensure user owns this book
+      userId, // Ensure user owns this book
     },
-    include: { book: true }
-  })
-  
+    include: { book: true },
+  });
+
   if (!userBook) {
-    throw new Error('Book not found or access denied')
+    throw new Error("Book not found or access denied");
   }
-  
+
   const updatedUserBook = await prisma.userBook.update({
     where: { id: userBookId },
     data: {
       status,
       ...additionalData,
-      ...(status === BookStatus.COMPLETED && !additionalData?.finishDate && {
-        finishDate: new Date()
-      })
+      ...(status === BookStatus.COMPLETED &&
+        !additionalData?.finishDate && {
+          finishDate: new Date(),
+        }),
     },
     include: {
       book: true,
       user: {
-        select: { id: true, name: true, image: true }
-      }
-    }
-  })
-  
+        select: { id: true, name: true, image: true },
+      },
+    },
+  });
+
   // Log activity for status changes
   if (status === BookStatus.COMPLETED) {
     await prisma.activityLog.create({
       data: {
         familyId: userBook.familyId,
         userId,
-        actionType: 'book_completed',
-        entityType: 'book',
+        actionType: "book_completed",
+        entityType: "book",
         entityId: userBook.book.id,
         metadata: {
           title: userBook.book.title,
-          rating: additionalData?.rating
-        }
-      }
-    })
+          rating: additionalData?.rating,
+        },
+      },
+    });
   }
-  
-  return updatedUserBook
+
+  return updatedUserBook;
 }
 
 export async function getFamilyBooksWithStats(familyId: string) {
@@ -771,25 +782,28 @@ export async function getFamilyBooksWithStats(familyId: string) {
       include: {
         book: true,
         user: {
-          select: { id: true, name: true, image: true }
-        }
+          select: { id: true, name: true, image: true },
+        },
       },
-      orderBy: { updatedAt: 'desc' },
-      take: 20 // Limit for performance
+      orderBy: { updatedAt: "desc" },
+      take: 20, // Limit for performance
     }),
-    
+
     prisma.userBook.groupBy({
-      by: ['status'],
+      by: ["status"],
       where: { familyId },
-      _count: { status: true }
-    })
-  ])
-  
-  const statsMap = stats.reduce((acc, stat) => {
-    acc[stat.status] = stat._count.status
-    return acc
-  }, {} as Record<string, number>)
-  
+      _count: { status: true },
+    }),
+  ]);
+
+  const statsMap = stats.reduce(
+    (acc, stat) => {
+      acc[stat.status] = stat._count.status;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
   return {
     books,
     stats: {
@@ -797,15 +811,16 @@ export async function getFamilyBooksWithStats(familyId: string) {
       wantToRead: statsMap[BookStatus.WANT_TO_READ] || 0,
       currentlyReading: statsMap[BookStatus.CURRENTLY_READING] || 0,
       completed: statsMap[BookStatus.COMPLETED] || 0,
-      didNotFinish: statsMap[BookStatus.DID_NOT_FINISH] || 0
-    }
-  }
+      didNotFinish: statsMap[BookStatus.DID_NOT_FINISH] || 0,
+    },
+  };
 }
 ```
 
 ## 6. Component Examples
 
 ### Books Stats Component
+
 ```typescript
 // src/components/books/BooksStats.tsx
 import { motion } from "framer-motion"
@@ -886,6 +901,7 @@ export function BooksStats({ stats, isLoading }: BooksStatsProps) {
 ```
 
 ### Add Book Form
+
 ```typescript
 // src/components/books/AddBookForm.tsx
 "use client"
@@ -906,7 +922,7 @@ export function AddBookForm({ onClose, onSuccess }: AddBookFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -1128,6 +1144,7 @@ export function AddBookForm({ onClose, onSuccess }: AddBookFormProps) {
 ## 7. Package.json Updates
 
 ### Required Dependencies
+
 ```json
 {
   "dependencies": {
@@ -1155,42 +1172,73 @@ export function AddBookForm({ onClose, onSuccess }: AddBookFormProps) {
 ## 8. Database Seeding
 
 ### Seed Script
+
 ```typescript
 // prisma/seed.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
   // Seed streaming services
   const streamingServices = [
-    { name: 'Netflix', logoUrl: '/logos/netflix.png', websiteUrl: 'https://netflix.com', colorHex: '#E50914' },
-    { name: 'Disney+', logoUrl: '/logos/disney.png', websiteUrl: 'https://disneyplus.com', colorHex: '#113CCF' },
-    { name: 'Prime Video', logoUrl: '/logos/prime.png', websiteUrl: 'https://primevideo.com', colorHex: '#00A8E1' },
-    { name: 'Hulu', logoUrl: '/logos/hulu.png', websiteUrl: 'https://hulu.com', colorHex: '#1CE783' },
-    { name: 'HBO Max', logoUrl: '/logos/hbo.png', websiteUrl: 'https://hbomax.com', colorHex: '#B537F2' },
-    { name: 'Apple TV+', logoUrl: '/logos/apple.png', websiteUrl: 'https://tv.apple.com', colorHex: '#000000' },
-  ]
+    {
+      name: "Netflix",
+      logoUrl: "/logos/netflix.png",
+      websiteUrl: "https://netflix.com",
+      colorHex: "#E50914",
+    },
+    {
+      name: "Disney+",
+      logoUrl: "/logos/disney.png",
+      websiteUrl: "https://disneyplus.com",
+      colorHex: "#113CCF",
+    },
+    {
+      name: "Prime Video",
+      logoUrl: "/logos/prime.png",
+      websiteUrl: "https://primevideo.com",
+      colorHex: "#00A8E1",
+    },
+    {
+      name: "Hulu",
+      logoUrl: "/logos/hulu.png",
+      websiteUrl: "https://hulu.com",
+      colorHex: "#1CE783",
+    },
+    {
+      name: "HBO Max",
+      logoUrl: "/logos/hbo.png",
+      websiteUrl: "https://hbomax.com",
+      colorHex: "#B537F2",
+    },
+    {
+      name: "Apple TV+",
+      logoUrl: "/logos/apple.png",
+      websiteUrl: "https://tv.apple.com",
+      colorHex: "#000000",
+    },
+  ];
 
   for (const service of streamingServices) {
     await prisma.streamingService.upsert({
       where: { name: service.name },
       update: {},
       create: service,
-    })
+    });
   }
 
-  console.log('Database seeded successfully!')
+  console.log("Database seeded successfully!");
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
+  .catch(e => {
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
 ```
 
 This comprehensive mock implementation provides all the concrete examples needed to implement the database and authentication system for the Family App.

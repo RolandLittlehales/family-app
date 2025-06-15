@@ -1,5 +1,10 @@
-import { z } from 'zod';
-import { UserRole, BookStatus, StreamingStatus, ContentType } from '../../generated/prisma';
+import { z } from "zod";
+import {
+  UserRole,
+  BookStatus,
+  StreamingStatus,
+  ContentType,
+} from "../../generated/prisma";
 
 // Common validation schemas
 export const IdSchema = z.string().cuid();
@@ -13,7 +18,10 @@ export const PasswordSchema = z.string()
     'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
   );
 export const RatingSchema = z.number().min(1).max(5);
-export const InviteCodeSchema = z.string().length(8).regex(/^[A-Z0-9]+$/);
+export const InviteCodeSchema = z
+  .string()
+  .length(8)
+  .regex(/^[A-Z0-9]+$/);
 
 // User validation schemas
 export const CreateUserSchema = z.object({
@@ -29,7 +37,9 @@ export const CreateUserSchema = z.object({
   familyId: IdSchema.optional(),
 });
 
-export const UpdateUserSchema = CreateUserSchema.partial().omit({ passwordHash: true });
+export const UpdateUserSchema = CreateUserSchema.partial().omit({
+  passwordHash: true,
+});
 
 // Family validation schemas
 export const CreateFamilySchema = z.object({
@@ -59,7 +69,9 @@ export const CreateBookSchema = z.object({
   familyId: IdSchema,
 });
 
-export const UpdateBookSchema = CreateBookSchema.partial().omit({ familyId: true });
+export const UpdateBookSchema = CreateBookSchema.partial().omit({
+  familyId: true,
+});
 
 export const CreateUserBookSchema = z.object({
   userId: IdSchema,
@@ -73,7 +85,10 @@ export const CreateUserBookSchema = z.object({
   isFavorite: z.boolean().optional(),
 });
 
-export const UpdateUserBookSchema = CreateUserBookSchema.partial().omit({ userId: true, bookId: true });
+export const UpdateUserBookSchema = CreateUserBookSchema.partial().omit({
+  userId: true,
+  bookId: true,
+});
 
 // Streaming validation schemas
 export const CreateStreamingContentSchema = z.object({
@@ -94,7 +109,8 @@ export const CreateStreamingContentSchema = z.object({
   familyId: IdSchema,
 });
 
-export const UpdateStreamingContentSchema = CreateStreamingContentSchema.partial().omit({ familyId: true });
+export const UpdateStreamingContentSchema =
+  CreateStreamingContentSchema.partial().omit({ familyId: true });
 
 export const CreateUserStreamingItemSchema = z.object({
   userId: IdSchema,
@@ -110,10 +126,11 @@ export const CreateUserStreamingItemSchema = z.object({
   isFavorite: z.boolean().optional(),
 });
 
-export const UpdateUserStreamingItemSchema = CreateUserStreamingItemSchema.partial().omit({ 
-  userId: true, 
-  streamingContentId: true 
-});
+export const UpdateUserStreamingItemSchema =
+  CreateUserStreamingItemSchema.partial().omit({
+    userId: true,
+    streamingContentId: true,
+  });
 
 // Pagination validation
 export const PaginationSchema = z.object({
@@ -129,37 +146,49 @@ export const SearchSchema = z.object({
 });
 
 // Reading session validation
-export const CreateReadingSessionSchema = z.object({
-  userId: IdSchema,
-  bookId: IdSchema,
-  startPage: z.number().min(1),
-  endPage: z.number().min(1),
-  duration: z.number().min(1),
-  date: z.date(),
-  notes: z.string().max(500).optional(),
-}).refine((data) => data.endPage >= data.startPage, {
-  message: "End page must be greater than or equal to start page",
-  path: ["endPage"],
-});
+export const CreateReadingSessionSchema = z
+  .object({
+    userId: IdSchema,
+    bookId: IdSchema,
+    startPage: z.number().min(1),
+    endPage: z.number().min(1),
+    duration: z.number().min(1),
+    date: z.date(),
+    notes: z.string().max(500).optional(),
+  })
+  .refine(data => data.endPage >= data.startPage, {
+    message: "End page must be greater than or equal to start page",
+    path: ["endPage"],
+  });
 
 // Watching session validation
-export const CreateWatchingSessionSchema = z.object({
-  userId: IdSchema,
-  streamingContentId: IdSchema.optional(),
-  episodeId: IdSchema.optional(),
-  duration: z.number().min(1),
-  date: z.date(),
-  notes: z.string().max(500).optional(),
-}).refine((data) => (data.streamingContentId && !data.episodeId) || (!data.streamingContentId && data.episodeId), {
-  message: "Either streamingContentId or episodeId must be provided, but not both",
-  path: ["streamingContentId"],
-});
+export const CreateWatchingSessionSchema = z
+  .object({
+    userId: IdSchema,
+    streamingContentId: IdSchema.optional(),
+    episodeId: IdSchema.optional(),
+    duration: z.number().min(1),
+    date: z.date(),
+    notes: z.string().max(500).optional(),
+  })
+  .refine(
+    data =>
+      (data.streamingContentId && !data.episodeId) ||
+      (!data.streamingContentId && data.episodeId),
+    {
+      message:
+        "Either streamingContentId or episodeId must be provided, but not both",
+      path: ["streamingContentId"],
+    }
+  );
 
 // Helper function for validation
 export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): T {
   const result = schema.safeParse(data);
   if (!result.success) {
-    throw new Error(`Validation error: ${result.error.errors.map(e => e.message).join(', ')}`);
+    throw new Error(
+      `Validation error: ${result.error.errors.map(e => e.message).join(", ")}`
+    );
   }
   return result.data;
 }

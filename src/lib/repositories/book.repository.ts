@@ -1,5 +1,10 @@
-import { Book, UserBook, BookStatus, Prisma } from '../../generated/prisma';
-import { BaseRepository, PaginationOptions, PaginatedResult, PaginationHelper } from './base.repository';
+import { Book, UserBook, BookStatus, Prisma } from "../../generated/prisma";
+import {
+  BaseRepository,
+  PaginationOptions,
+  PaginatedResult,
+  PaginationHelper,
+} from "./base.repository";
 
 export interface CreateBookData {
   title: string;
@@ -105,7 +110,7 @@ export class BookRepository extends BaseRepository {
             },
           },
           orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
           },
         },
         _count: {
@@ -128,26 +133,27 @@ export class BookRepository extends BaseRepository {
     filters: BookFilters = {},
     pagination: PaginationOptions = {}
   ): Promise<PaginatedResult<Book>> {
-    const { page, limit, skip, take } = PaginationHelper.getPaginationParams(pagination);
-    
+    const { page, limit, skip, take } =
+      PaginationHelper.getPaginationParams(pagination);
+
     const where: Prisma.BookWhereInput = {};
-    
+
     if (filters.familyId) {
       where.familyId = filters.familyId;
     }
-    
+
     if (filters.genre) {
       where.genre = { contains: filters.genre };
     }
-    
+
     if (filters.author) {
       where.author = { contains: filters.author };
     }
-    
+
     if (filters.language) {
       where.language = filters.language;
     }
-    
+
     if (filters.search) {
       where.OR = [
         { title: { contains: filters.search } },
@@ -171,7 +177,7 @@ export class BookRepository extends BaseRepository {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: "desc",
         },
       }),
       this.prisma.book.count({ where }),
@@ -223,7 +229,11 @@ export class BookRepository extends BaseRepository {
     });
   }
 
-  async updateUserBook(userId: string, bookId: string, data: UpdateUserBookData): Promise<UserBook> {
+  async updateUserBook(
+    userId: string,
+    bookId: string,
+    data: UpdateUserBookData
+  ): Promise<UserBook> {
     return this.prisma.userBook.update({
       where: {
         userId_bookId: {
@@ -284,12 +294,13 @@ export class BookRepository extends BaseRepository {
     status?: BookStatus,
     pagination: PaginationOptions = {}
   ): Promise<PaginatedResult<UserBook>> {
-    const { page, limit, skip, take } = PaginationHelper.getPaginationParams(pagination);
-    
+    const { page, limit, skip, take } =
+      PaginationHelper.getPaginationParams(pagination);
+
     const where: Prisma.UserBookWhereInput = {
       userId,
     };
-    
+
     if (status) {
       where.status = status;
     }
@@ -303,7 +314,7 @@ export class BookRepository extends BaseRepository {
           book: true,
         },
         orderBy: {
-          updatedAt: 'desc',
+          updatedAt: "desc",
         },
       }),
       this.prisma.userBook.count({ where }),
@@ -336,7 +347,7 @@ export class BookRepository extends BaseRepository {
       },
       orderBy: {
         userBooks: {
-          _count: 'desc',
+          _count: "desc",
         },
       },
       take: limit,
@@ -349,7 +360,7 @@ export class BookRepository extends BaseRepository {
         familyId,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: limit,
     });
@@ -357,32 +368,36 @@ export class BookRepository extends BaseRepository {
 
   async getUserBookStats(userId: string) {
     const stats = await this.prisma.userBook.groupBy({
-      by: ['status'],
+      by: ["status"],
       where: { userId },
-      _count: { status: true }
+      _count: { status: true },
     });
-    
+
     const result = {
       wishlist: 0,
       reading: 0,
       completed: 0,
       paused: 0,
       abandoned: 0,
-      total: 0
+      total: 0,
     };
-    
+
     stats.forEach(stat => {
       const status = stat.status.toLowerCase() as keyof typeof result;
-      if (status !== 'total' && status in result) {
+      if (status !== "total" && status in result) {
         result[status] = stat._count.status;
         result.total += stat._count.status;
       }
     });
-    
+
     return result;
   }
 
-  async searchBooks(query: string, familyId?: string, limit: number = 20): Promise<Book[]> {
+  async searchBooks(
+    query: string,
+    familyId?: string,
+    limit: number = 20
+  ): Promise<Book[]> {
     const where: Prisma.BookWhereInput = {
       OR: [
         { title: { contains: query } },
@@ -400,7 +415,7 @@ export class BookRepository extends BaseRepository {
       where,
       take: limit,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }

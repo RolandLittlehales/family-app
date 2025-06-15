@@ -1,86 +1,97 @@
-import { Prisma } from '../../generated/prisma';
+import { Prisma } from "../../generated/prisma";
 
 export class DatabaseError extends Error {
-  constructor(message: string, public originalError?: unknown) {
+  constructor(
+    message: string,
+    public originalError?: unknown
+  ) {
     super(message);
-    this.name = 'DatabaseError';
+    this.name = "DatabaseError";
   }
 }
 
 export class ValidationError extends Error {
-  constructor(message: string, public field?: string) {
+  constructor(
+    message: string,
+    public field?: string
+  ) {
     super(message);
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
   }
 }
 
 export class NotFoundError extends Error {
   constructor(resource: string, id?: string) {
-    super(`${resource}${id ? ` with id ${id}` : ''} not found`);
-    this.name = 'NotFoundError';
+    super(`${resource}${id ? ` with id ${id}` : ""} not found`);
+    this.name = "NotFoundError";
   }
 }
 
 export class ConflictError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'ConflictError';
+    this.name = "ConflictError";
   }
 }
 
 export class UnauthorizedError extends Error {
-  constructor(message: string = 'Unauthorized') {
+  constructor(message: string = "Unauthorized") {
     super(message);
-    this.name = 'UnauthorizedError';
+    this.name = "UnauthorizedError";
   }
 }
 
 export function handleDatabaseError(error: unknown): never {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
-      case 'P2002': {
+      case "P2002": {
         // Unique constraint failed
         const target = error.meta?.target as string[] | undefined;
-        const field = target?.[0] || 'field';
+        const field = target?.[0] || "field";
         throw new ConflictError(`${field} already exists`);
       }
-      
-      case 'P2025':
+
+      case "P2025":
         // Record not found
-        throw new NotFoundError('Record');
-      
-      case 'P2003':
+        throw new NotFoundError("Record");
+
+      case "P2003":
         // Foreign key constraint failed
-        throw new ValidationError('Referenced record does not exist');
-      
-      case 'P2014':
+        throw new ValidationError("Referenced record does not exist");
+
+      case "P2014":
         // Required relation constraint failed
-        throw new ValidationError('Required relationship is missing');
-      
-      case 'P2000':
+        throw new ValidationError("Required relationship is missing");
+
+      case "P2000":
         // Value too long for column
-        throw new ValidationError('Input value is too long');
-      
+        throw new ValidationError("Input value is too long");
+
       default:
         throw new DatabaseError(`Database error: ${error.message}`, error);
     }
   }
-  
+
   if (error instanceof Prisma.PrismaClientValidationError) {
     throw new ValidationError(`Validation error: ${error.message}`);
   }
-  
+
   if (error instanceof Prisma.PrismaClientInitializationError) {
-    throw new DatabaseError(`Database connection error: ${error.message}`, error);
+    throw new DatabaseError(
+      `Database connection error: ${error.message}`,
+      error
+    );
   }
-  
-  if (error instanceof ValidationError || 
-      error instanceof NotFoundError || 
-      error instanceof ConflictError || 
-      error instanceof UnauthorizedError) {
+
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof ConflictError ||
+    error instanceof UnauthorizedError
+  ) {
     throw error;
   }
-  
+
   // Unknown error
   throw new DatabaseError(`Unexpected database error: ${error}`, error);
 }

@@ -3,7 +3,9 @@
 ## Technology Stack Recommendation
 
 ### Primary Option: NextAuth.js v5 (Auth.js)
+
 **Rationale**:
+
 - Native Next.js integration with App Router support
 - Multiple provider support (Google, Apple, Email)
 - Built-in session management
@@ -12,6 +14,7 @@
 - Database session storage with Prisma adapter
 
 ### Alternative Options:
+
 1. **Clerk** - More features but paid service
 2. **Supabase Auth** - If using Supabase for database
 3. **Firebase Auth** - Google ecosystem integration
@@ -22,6 +25,7 @@
 ### User Journey
 
 #### 1. New Family Setup
+
 ```
 1. User visits app → Redirected to /auth/signin
 2. User signs up with email/Google → Account created
@@ -31,6 +35,7 @@
 ```
 
 #### 2. Family Member Invitation
+
 ```
 1. Admin sends invitation link/email
 2. Invitee clicks link → Redirected to /auth/join?token=xyz
@@ -40,6 +45,7 @@
 ```
 
 #### 3. Returning User
+
 ```
 1. User visits app → Check session
 2. If authenticated → Redirect to dashboard
@@ -50,12 +56,14 @@
 ### Authentication Providers
 
 #### Primary: Email + Password
+
 - Simple email/password registration
 - Email verification required
 - Password reset functionality
 - Account recovery options
 
 #### Secondary: OAuth Providers
+
 - **Google OAuth** - Most popular for families
 - **Apple Sign In** - iOS users
 - **Microsoft OAuth** - Optional for Office 365 families
@@ -63,6 +71,7 @@
 ## Implementation Architecture
 
 ### File Structure
+
 ```
 src/
 ├── app/
@@ -108,11 +117,11 @@ src/
 
 ```typescript
 // src/lib/auth.ts
-import { NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import GoogleProvider from "next-auth/providers/google"
-import EmailProvider from "next-auth/providers/email"
-import { prisma } from "./db"
+import { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import GoogleProvider from "next-auth/providers/google";
+import EmailProvider from "next-auth/providers/email";
+import { prisma } from "./db";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -139,8 +148,8 @@ export const authOptions: NextAuthOptions = {
       const familyMember = await prisma.familyMember.findFirst({
         where: { userId: user.id },
         include: { family: true },
-      })
-      
+      });
+
       return {
         ...session,
         user: {
@@ -149,15 +158,15 @@ export const authOptions: NextAuthOptions = {
           family: familyMember?.family || null,
           role: familyMember?.role || null,
         },
-      }
+      };
     },
     async signIn({ user, account, profile }) {
       // Custom sign-in logic
       if (account?.provider === "google") {
         // Handle Google sign-in
-        return true
+        return true;
       }
-      return true
+      return true;
     },
   },
   pages: {
@@ -174,51 +183,51 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile, isNewUser }) {
       if (isNewUser) {
         // Track new user registration
-        console.log(`New user registered: ${user.email}`)
+        console.log(`New user registered: ${user.email}`);
       }
     },
   },
-}
+};
 ```
 
 ### Route Protection Middleware
 
 ```typescript
 // middleware.ts
-import { withAuth } from "next-auth/middleware"
+import { withAuth } from "next-auth/middleware";
 
 export default withAuth(
   function middleware(req) {
     // Additional middleware logic
-    const { pathname } = req.nextUrl
-    const token = req.nextauth.token
+    const { pathname } = req.nextUrl;
+    const token = req.nextauth.token;
 
     // Redirect to family setup if user has no family
     if (token && !token.family && pathname.startsWith("/dashboard")) {
-      return Response.redirect(new URL("/onboarding", req.url))
+      return Response.redirect(new URL("/onboarding", req.url));
     }
 
     // Admin-only routes
     if (pathname.startsWith("/admin") && token?.role !== "admin") {
-      return Response.redirect(new URL("/dashboard", req.url))
+      return Response.redirect(new URL("/dashboard", req.url));
     }
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        const { pathname } = req.nextUrl
-        
+        const { pathname } = req.nextUrl;
+
         // Public routes
         if (pathname.startsWith("/auth") || pathname === "/") {
-          return true
+          return true;
         }
-        
+
         // Protected routes require authentication
-        return !!token
+        return !!token;
       },
     },
   }
-)
+);
 
 export const config = {
   matcher: [
@@ -228,19 +237,22 @@ export const config = {
     "/admin/:path*",
     "/api/:path*",
   ],
-}
+};
 ```
 
 ## Database Integration
 
 ### NextAuth Database Tables
+
 NextAuth will automatically create these tables:
+
 - `accounts` - OAuth provider accounts
 - `sessions` - User sessions
 - `users` - Basic user information
 - `verification_tokens` - Email verification tokens
 
 ### Custom Extensions
+
 We'll extend the default schema to integrate with our family system:
 
 ```typescript
@@ -251,22 +263,22 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  
+
   // Our custom fields
   dateOfBirth   DateTime? @db.Date
   preferences   Json      @default("{}")
   role          String    @default("member")
-  
+
   // Relations
   accounts      Account[]
   sessions      Session[]
   familyMembers FamilyMember[]
   userBooks     UserBook[]
   userMedia     UserMedia[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@map("users")
 }
 ```
@@ -277,10 +289,13 @@ model User {
 
 ```typescript
 // lib/auth-helpers.ts
-export async function createFamily(userId: string, familyData: {
-  name: string
-  description?: string
-}) {
+export async function createFamily(
+  userId: string,
+  familyData: {
+    name: string;
+    description?: string;
+  }
+) {
   const family = await prisma.family.create({
     data: {
       name: familyData.name,
@@ -299,9 +314,9 @@ export async function createFamily(userId: string, familyData: {
         },
       },
     },
-  })
-  
-  return family
+  });
+
+  return family;
 }
 ```
 
@@ -309,7 +324,7 @@ export async function createFamily(userId: string, familyData: {
 
 ```typescript
 // lib/invitations.ts
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 export async function createFamilyInvitation(
   familyId: string,
@@ -321,8 +336,8 @@ export async function createFamilyInvitation(
     { familyId, email, inviterUserId },
     process.env.NEXTAUTH_SECRET!,
     { expiresIn: "7d" }
-  )
-  
+  );
+
   // Store invitation in database
   const invitation = await prisma.familyInvitation.create({
     data: {
@@ -332,32 +347,32 @@ export async function createFamilyInvitation(
       invitedBy: inviterUserId,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     },
-  })
-  
+  });
+
   // Send invitation email
-  await sendInvitationEmail(email, token, familyId)
-  
-  return invitation
+  await sendInvitationEmail(email, token, familyId);
+
+  return invitation;
 }
 
 export async function acceptFamilyInvitation(token: string, userId: string) {
   // Verify token
   const payload = jwt.verify(token, process.env.NEXTAUTH_SECRET!) as {
-    familyId: string
-    email: string
-    inviterUserId: string
-  }
-  
+    familyId: string;
+    email: string;
+    inviterUserId: string;
+  };
+
   // Check if invitation exists and is valid
   const invitation = await prisma.familyInvitation.findUnique({
     where: { token },
     include: { family: true },
-  })
-  
+  });
+
   if (!invitation || invitation.expiresAt < new Date()) {
-    throw new Error("Invalid or expired invitation")
+    throw new Error("Invalid or expired invitation");
   }
-  
+
   // Add user to family
   await prisma.familyMember.create({
     data: {
@@ -365,15 +380,15 @@ export async function acceptFamilyInvitation(token: string, userId: string) {
       userId,
       role: "member",
     },
-  })
-  
+  });
+
   // Mark invitation as used
   await prisma.familyInvitation.update({
     where: { token },
     data: { usedAt: new Date() },
-  })
-  
-  return invitation.family
+  });
+
+  return invitation.family;
 }
 ```
 
@@ -385,7 +400,7 @@ export async function acceptFamilyInvitation(token: string, userId: string) {
 // lib/permissions.ts
 export enum FamilyRole {
   ADMIN = "admin",
-  MEMBER = "member", 
+  MEMBER = "member",
   CHILD = "child",
 }
 
@@ -397,30 +412,26 @@ export const permissions = {
     "content.manage",
     "settings.edit",
   ],
-  [FamilyRole.MEMBER]: [
-    "content.add",
-    "content.edit_own",
-    "profile.edit",
-  ],
+  [FamilyRole.MEMBER]: ["content.add", "content.edit_own", "profile.edit"],
   [FamilyRole.CHILD]: [
     "content.view",
     "content.add_with_approval",
     "profile.edit_limited",
   ],
-}
+};
 
 export function hasPermission(role: string, permission: string): boolean {
-  return permissions[role as FamilyRole]?.includes(permission) || false
+  return permissions[role as FamilyRole]?.includes(permission) || false;
 }
 
 // Usage in API routes
 export function requirePermission(permission: string) {
   return async (req: Request, user: User) => {
-    const familyMember = await getFamilyMember(user.id)
+    const familyMember = await getFamilyMember(user.id);
     if (!hasPermission(familyMember.role, permission)) {
-      throw new Error("Insufficient permissions")
+      throw new Error("Insufficient permissions");
     }
-  }
+  };
 }
 ```
 
@@ -437,12 +448,12 @@ export async function getFamilyBooks(userId: string, familyId: string) {
         familyId,
       },
     },
-  })
-  
+  });
+
   if (!familyMember) {
-    throw new Error("Access denied")
+    throw new Error("Access denied");
   }
-  
+
   // Return books for this family, respecting privacy settings
   return prisma.userBook.findMany({
     where: {
@@ -456,13 +467,14 @@ export async function getFamilyBooks(userId: string, familyId: string) {
       book: true,
       user: true,
     },
-  })
+  });
 }
 ```
 
 ## Security Implementation
 
 ### Environment Variables
+
 ```bash
 # .env.local
 NEXTAUTH_URL=http://localhost:3000
@@ -484,28 +496,31 @@ EMAIL_FROM=noreply@family-app.com
 ```
 
 ### Rate Limiting
+
 ```typescript
 // lib/rate-limit.ts
-import { Ratelimit } from "@upstash/ratelimit"
-import { Redis } from "@upstash/redis"
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(10, "10 s"),
-})
+});
 
 export async function rateLimitCheck(identifier: string) {
-  const { success, limit, reset, remaining } = await ratelimit.limit(identifier)
-  
+  const { success, limit, reset, remaining } =
+    await ratelimit.limit(identifier);
+
   if (!success) {
-    throw new Error("Rate limit exceeded")
+    throw new Error("Rate limit exceeded");
   }
-  
-  return { limit, reset, remaining }
+
+  return { limit, reset, remaining };
 }
 ```
 
 ### CSRF Protection
+
 ```typescript
 // Built into NextAuth.js, but additional protection for API routes
 import { csrfToken } from "next-auth/react"
@@ -517,32 +532,34 @@ import { csrfToken } from "next-auth/react"
 ## Testing Strategy
 
 ### Authentication Tests
+
 ```typescript
 // __tests__/auth.test.ts
-import { createMocks } from "node-mocks-http"
-import { authOptions } from "@/lib/auth"
-import { getServerSession } from "next-auth"
+import { createMocks } from "node-mocks-http";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 describe("Authentication", () => {
   it("should create family on first sign-in", async () => {
     // Test family creation flow
-  })
-  
+  });
+
   it("should handle family invitations", async () => {
     // Test invitation flow
-  })
-  
+  });
+
   it("should enforce role-based permissions", async () => {
     // Test permission system
-  })
-})
+  });
+});
 ```
 
 ### Integration with Existing Pages
+
 The authentication system will be integrated into existing pages through:
 
 1. **Layout Updates**: Add authentication provider wrapper
-2. **Route Protection**: Middleware to protect dashboard routes  
+2. **Route Protection**: Middleware to protect dashboard routes
 3. **User Context**: Provide user/family context to components
 4. **API Integration**: Secure API routes with session validation
 

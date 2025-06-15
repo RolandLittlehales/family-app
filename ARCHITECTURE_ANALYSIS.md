@@ -3,6 +3,7 @@
 ## Current Implementation (OOP Repository Pattern)
 
 ### Pros
+
 - **Familiar Pattern**: Well-known Repository pattern, easy for team onboarding
 - **Encapsulation**: Related methods grouped logically (UserRepository has all user operations)
 - **Polymorphism**: Base class provides common functionality (pagination, error handling)
@@ -11,6 +12,7 @@
 - **State Management**: Shared Prisma client instance managed cleanly
 
 ### Cons
+
 - **Overhead**: Class instantiation and inheritance complexity
 - **Coupling**: Methods tied to class instances
 - **Memory**: Class instances consume more memory than pure functions
@@ -18,6 +20,7 @@
 ## Alternative: Functional Programming Approach
 
 ### How It Would Look
+
 ```typescript
 // Current OOP
 const user = await repositories.user.findById(id);
@@ -30,6 +33,7 @@ const user = await findUser(id);
 ```
 
 ### FP Implementation Benefits
+
 - **Pure Functions**: Easier to test and reason about
 - **Composition**: Functions can be composed and reused
 - **Tree Shaking**: Better bundle optimization
@@ -37,6 +41,7 @@ const user = await findUser(id);
 - **Performance**: No class instantiation overhead
 
 ### FP Implementation Challenges
+
 - **Prisma Client**: Would need to pass client to every function
 - **Code Organization**: Harder to group related operations
 - **TypeScript**: More complex type definitions for curried functions
@@ -52,6 +57,7 @@ Given the current context, I recommend keeping the OOP Repository pattern becaus
 4. **Future Migration**: Can easily refactor to FP later if needed
 
 ### Where FP Principles Are Already Applied
+
 - **Pure Functions**: Validation schemas, error handlers
 - **Immutability**: All database operations return new objects
 - **Composition**: Repository factory composes dependencies

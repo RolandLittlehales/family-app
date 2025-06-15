@@ -1,12 +1,12 @@
-import { prisma } from '../database';
-import { UserRepository } from './user.repository';
-import { FamilyRepository } from './family.repository';
-import { BookRepository } from './book.repository';
-import { StreamingRepository } from './streaming.repository';
+import { prisma } from "../database";
+import { UserRepository } from "./user.repository";
+import { FamilyRepository } from "./family.repository";
+import { BookRepository } from "./book.repository";
+import { StreamingRepository } from "./streaming.repository";
 
 export class RepositoryFactory {
   private static instance: RepositoryFactory;
-  
+
   public readonly user: UserRepository;
   public readonly family: FamilyRepository;
   public readonly book: BookRepository;
@@ -29,8 +29,8 @@ export class RepositoryFactory {
 
 export const repositories = RepositoryFactory.getInstance();
 
-export * from './base.repository';
-export * from './user.repository';
-export * from './family.repository';
-export * from './book.repository';
-export * from './streaming.repository';
+export * from "./base.repository";
+export * from "./user.repository";
+export * from "./family.repository";
+export * from "./book.repository";
+export * from "./streaming.repository";

@@ -153,13 +153,60 @@ globalStyle("@media (max-width: 768px)", { ... }); // Wrong syntax
 
 ## URLs Currently Working
 
-✅ `http://localhost:3002/` - Home page with navigation cards  
-✅ `http://localhost:3002/books` - Books management with stats and feature cards  
-✅ `http://localhost:3002/streaming` - Streaming services with preview cards
+✅ `http://localhost:3000/` - Home page with navigation cards  
+✅ `http://localhost:3000/books` - Books management with stats and feature cards  
+✅ `http://localhost:3000/streaming` - Streaming services with preview cards
 
 All pages are fully responsive and use the vanilla-extract theme system consistently.
 
-### 8. **Work Breakdown and GitHub Issues Strategy**
+## Setup and Development Environment
+
+### 8. **Development Environment Documentation**
+
+**Problem**: New developers needed comprehensive setup documentation beyond basic Next.js boilerplate.
+
+**Solution Created**:
+
+- **Updated README.md**: Complete project-specific setup guide with technology stack, scripts, and troubleshooting
+- **Created .env.example**: Template for future environment configuration with comprehensive examples
+- **Setup Validation Script**: `npm run setup:check` validates entire development environment
+- **Onboarding Checklist**: ONBOARDING.md with step-by-step developer setup process
+
+**Key Setup Files Added**:
+
+- `README.md` - Project overview and development workflow
+- `.env.example` - Environment configuration template
+- `scripts/setup-check.js` - Automated environment validation
+- `ONBOARDING.md` - Developer onboarding checklist
+
+**Setup Validation Checks**:
+
+1. Node.js version (18+)
+2. npm availability
+3. Required project files
+4. Dependencies installation
+5. Package scripts configuration
+6. Environment template
+7. TypeScript compilation
+8. ESLint validation
+9. Build success
+10. Dev server configuration
+
+**New npm Scripts**:
+
+- `setup:check` - Validates complete development environment
+
+**Lesson**: **Comprehensive documentation and automation reduces onboarding friction and ensures consistent development environments.**
+
+### Environment Configuration Insights
+
+**Current State**: App runs without environment variables - pure frontend prototype
+
+**Prepared For**: Database integration, external APIs, authentication, file storage, analytics
+
+**Environment Structure**: Organized by feature area with clear examples and documentation
+
+### 9. **Work Breakdown and GitHub Issues Strategy**
 
 **Problem**: Initial approach created too many micro-tasks that didn't represent meaningful units of work, leading to inefficient parallel development.
 
@@ -195,6 +242,7 @@ Integration Layer (Final Assembly)
 ```
 
 **Success Metrics**:
+
 - **Total Issues**: 12 comprehensive issues vs 500+ micro-tasks
 - **Parallel Execution**: Up to 4 teams can work simultaneously on foundation
 - **Clear Dependencies**: Each issue has well-defined prerequisites
@@ -214,6 +262,7 @@ Integration Layer (Final Assembly)
 - **Time/LOC Estimates**: Realistic sizing for sprint planning
 
 **Master Tracking Issue Benefits**:
+
 - **Dependency Visualization**: Mermaid graphs show work relationships
 - **Progress Tracking**: Real-time completion status
 - **Team Coordination**: Clear handoff points between teams
@@ -226,6 +275,7 @@ Integration Layer (Final Assembly)
 **Problem**: Original authentication requirements were over-engineered for a family app context, including complex JWT tokens, email verification, and enterprise-level security features.
 
 **Analysis Process**:
+
 - Examined current Next.js app structure and scope
 - Reviewed existing GitHub issues and complexity level
 - Analyzed family app use case (5-15 trusted users)
@@ -234,6 +284,7 @@ Integration Layer (Final Assembly)
 **Key Simplifications Made**:
 
 **Removed Complexity**:
+
 - ❌ JWT token management (replaced with Next.js sessions)
 - ❌ Email verification (unnecessary for family trust model)
 - ❌ Complex user status workflows
@@ -242,6 +293,7 @@ Integration Layer (Final Assembly)
 - ❌ Enterprise-level session refresh logic
 
 **Simplified Approach**:
+
 - ✅ Next.js built-in session management with encrypted cookies
 - ✅ Prisma ORM for user data storage
 - ✅ Simple email/password authentication
@@ -250,6 +302,7 @@ Integration Layer (Final Assembly)
 - ✅ Basic route protection
 
 **Documentation Updates**:
+
 1. **Issue #4**: Completely rewritten with simplified requirements
 2. **Issue #48**: Created new issue specifically for admin approval system
 3. **README.md**: Full authentication section added with:
@@ -260,6 +313,7 @@ Integration Layer (Final Assembly)
    - Admin setup process
 
 **Database Schema Simplified**:
+
 ```prisma
 model User {
   id        String   @id @default(cuid())
@@ -276,6 +330,7 @@ model User {
 **Lesson**: **Match technology complexity to actual use case. Family apps don't need enterprise security - focus on usability while maintaining essential security.**
 
 **Authentication Flow Decision**:
+
 1. User registers → `isActive: false`
 2. Admin approves → `isActive: true`
 3. User logs in with email/password
@@ -283,6 +338,7 @@ model User {
 5. No email verification or JWT token complexity
 
 **Security Trade-offs Documented**:
+
 - No email verification (family trust model)
 - No advanced rate limiting (family use only)
 - Cookie sessions instead of JWT (simpler, secure for web apps)
@@ -295,6 +351,7 @@ model User {
 **How to Identify Merge Conflicts**:
 
 1. **Check for new commits on main**:
+
    ```bash
    git fetch origin
    git log --oneline HEAD..origin/main  # Commits we're missing
@@ -302,6 +359,7 @@ model User {
    ```
 
 2. **Attempt merge to detect conflicts**:
+
    ```bash
    git merge origin/main
    # If conflicts exist, git will show: "CONFLICT (content): Merge conflict in <file>"
@@ -316,20 +374,23 @@ model User {
 **Conflict Resolution Process**:
 
 1. **Locate conflict markers in files**:
+
    ```
    <<<<<<< HEAD
    Your changes
    =======
-   Changes from main branch  
+   Changes from main branch
    >>>>>>> origin/main
    ```
 
 2. **Resolve conflicts by choosing/combining content**:
+
    - Keep your changes
    - Keep main branch changes
    - Combine both (most common for documentation)
 
 3. **Remove conflict markers and test**:
+
    ```bash
    # Edit files to remove <<<<<<< ======= >>>>>>> markers
    # Test that resolution works correctly
@@ -343,6 +404,7 @@ model User {
    ```
 
 **Prevention Strategies**:
+
 - **Frequent syncing**: Regularly merge main into feature branches
 - **Small, focused PRs**: Reduce likelihood of conflicts
 - **Communication**: Coordinate when multiple people edit same files
@@ -364,6 +426,7 @@ model User {
 **User Communication Best Practices**:
 
 **Always inform users when authentication may be required**:
+
 ```bash
 # ❌ Bad - Silent authentication attempt
 gh pr create --title "..." --body "..."
@@ -374,6 +437,7 @@ gh pr create --title "..." --body "..."
 ```
 
 **Proactive Authentication Check**:
+
 ```bash
 # Check if authenticated before running commands
 gh auth status || {
@@ -383,6 +447,7 @@ gh auth status || {
 ```
 
 **Clear Error Messages**:
+
 - Explain what authentication is needed
 - Provide exact commands to resolve issues
 - Mention that browser popup may appear
@@ -391,6 +456,7 @@ gh auth status || {
 **Authentication Flow Documentation**:
 
 1. **Initial Setup**:
+
    ```bash
    gh auth login
    # Follow browser prompts (may open new tab)
@@ -399,6 +465,7 @@ gh auth status || {
    ```
 
 2. **Token Refresh**:
+
    ```bash
    gh auth refresh
    # May require re-authorization in browser
@@ -428,6 +495,7 @@ gh auth status || {
 5. **Check auth status first** when possible: `gh auth status`
 
 **Example Implementation**:
+
 ```bash
 echo "🔐 Creating GitHub PR - authentication popup may appear..."
 echo "If prompted, please complete GitHub login in your browser"
@@ -435,3 +503,49 @@ gh pr create --title "docs: Update requirements" --body "..."
 ```
 
 **Lesson**: **GitHub CLI authentication can interrupt workflow unexpectedly. Always communicate with users about potential authentication requirements, browser popups, and provide clear guidance for resolving authentication issues.**
+
+### 13. **Successful Merge Conflict Resolution**
+
+**Context**: Working on `rolan/foundation-1` branch which had diverged from main branch by 15 commits. Main branch received new form components while foundation branch was focused on documentation.
+
+**Conflict Detection**:
+
+```bash
+git fetch origin                # Get latest changes
+git merge origin/main          # Attempt merge
+```
+
+**Result**: **No conflicts!** Merge was successful using Git's 'ort' strategy.
+
+**Files Added from Main Branch**:
+
+- Complete form component library (2,205 lines added)
+- New components: Checkbox, FileUpload, FormField, Input, Radio, Select, Textarea
+- Form validation hook: `useFormValidation.ts`
+- Enhanced theme system updates
+- Component index for easy imports
+
+**Why No Conflicts Occurred**:
+
+1. **Clean Separation**: Documentation changes (foundation branch) vs component implementation (main branch)
+2. **Different File Sets**: Foundation branch touched README.md, ONBOARDING.md, .env.example, scripts/
+3. **Main Branch Added**: New component files in src/components/ with no overlap
+4. **No Shared File Modifications**: Each branch worked on different parts of the codebase
+
+**Successful Merge Strategy**:
+
+- Foundation branch: Documentation and setup tooling
+- Main branch: Component implementation
+- Result: Combined branch now has both comprehensive documentation AND complete form component library
+
+**Post-Merge State**:
+
+- ✅ All foundation documentation intact
+- ✅ Complete form component library available
+- ✅ Enhanced theme system with new utilities
+- ✅ Setup validation still working
+- ✅ Development environment fully functional
+
+**Key Insight**: **Good branch separation by concern (documentation vs implementation) prevented conflicts and enabled clean merges.**
+
+**Lesson**: **When working on parallel development streams, separate concerns cleanly by file/directory to minimize merge conflicts. Documentation changes and feature implementation can proceed independently when properly organized.**
