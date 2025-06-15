@@ -222,3 +222,53 @@ export const activeMobileMenuLink = style([
     },
   },
 ]);
+
+export const userMenu = style({
+  display: "flex",
+  alignItems: "center",
+  gap: "1rem",
+  "@media": {
+    "(max-width: 768px)": {
+      display: "none",
+    },
+  },
+});
+
+export const userName = style({
+  color: "#6B7280",
+  fontSize: "0.875rem",
+  fontWeight: "500",
+  "@media": {
+    "(prefers-color-scheme: dark)": {
+      color: "#9CA3AF",
+    },
+  },
+});
+
+export const signOutButton = style({
+  background: "none",
+  border: "1px solid #D1D5DB",
+  color: "#6B7280",
+  fontSize: "0.875rem",
+  fontWeight: "500",
+  padding: "0.5rem 1rem",
+  borderRadius: "0.375rem",
+  cursor: "pointer",
+  transition: "all 0.2s ease-in-out",
+  ":hover": {
+    backgroundColor: "#F3F4F6",
+    borderColor: "#9CA3AF",
+    color: "#374151",
+  },
+  "@media": {
+    "(prefers-color-scheme: dark)": {
+      borderColor: "#374151",
+      color: "#9CA3AF",
+      ":hover": {
+        backgroundColor: "#1F2937",
+        borderColor: "#6B7280",
+        color: "#F3F4F6",
+      },
+    },
+  },
+});

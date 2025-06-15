@@ -31,11 +31,12 @@ async function main() {
 
   const dad = await prisma.user.create({
     data: {
-      email: "dad@johnson.com",
-      username: "dadj",
-      firstName: "John",
-      lastName: "Johnson",
-      dateOfBirth: new Date("1985-03-15"),
+      email: 'dad@johnson.com',
+      username: 'dadj',
+      name: 'John Johnson',
+      firstName: 'John',
+      lastName: 'Johnson',
+      dateOfBirth: new Date('1985-03-15'),
       role: UserRole.PARENT,
       passwordHash,
       emailVerified: true,
@@ -46,11 +47,12 @@ async function main() {
 
   const mom = await prisma.user.create({
     data: {
-      email: "mom@johnson.com",
-      username: "momj",
-      firstName: "Sarah",
-      lastName: "Johnson",
-      dateOfBirth: new Date("1987-07-22"),
+      email: 'mom@johnson.com',
+      username: 'momj',
+      name: 'Sarah Johnson',
+      firstName: 'Sarah',
+      lastName: 'Johnson',
+      dateOfBirth: new Date('1987-07-22'),
       role: UserRole.PARENT,
       passwordHash,
       emailVerified: true,
@@ -61,11 +63,12 @@ async function main() {
 
   const child1 = await prisma.user.create({
     data: {
-      email: "emma@johnson.com",
-      username: "emmaj",
-      firstName: "Emma",
-      lastName: "Johnson",
-      dateOfBirth: new Date("2010-11-08"),
+      email: 'emma@johnson.com',
+      username: 'emmaj',
+      name: 'Emma Johnson',
+      firstName: 'Emma',
+      lastName: 'Johnson',
+      dateOfBirth: new Date('2010-11-08'),
       role: UserRole.CHILD,
       passwordHash,
       emailVerified: true,
@@ -76,11 +79,12 @@ async function main() {
 
   const child2 = await prisma.user.create({
     data: {
-      email: "alex@johnson.com",
-      username: "alexj",
-      firstName: "Alex",
-      lastName: "Johnson",
-      dateOfBirth: new Date("2012-05-14"),
+      email: 'alex@johnson.com',
+      username: 'alexj',
+      name: 'Alex Johnson',
+      firstName: 'Alex',
+      lastName: 'Johnson',
+      dateOfBirth: new Date('2012-05-14'),
       role: UserRole.CHILD,
       passwordHash,
       emailVerified: true,

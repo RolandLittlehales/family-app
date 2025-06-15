@@ -8,11 +8,12 @@ import {
 
 export interface CreateUserData {
   email: string;
-  username: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   passwordHash: string;
   role?: UserRole;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
   dateOfBirth?: Date;
   profilePicture?: string;
   bio?: string;
@@ -46,6 +47,7 @@ export class UserRepository extends BaseRepository {
     return this.prisma.user.create({
       data: {
         email: data.email,
+        name: data.name,
         username: data.username,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -162,6 +164,18 @@ export class UserRepository extends BaseRepository {
       where: { id },
       data: {
         lastLoginAt: new Date(),
+      },
+    });
+  }
+
+  async updateFamily(id: string, familyId: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        familyId,
+      },
+      include: {
+        family: true,
       },
     });
   }

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { themeClass } from "../styles/theme.css";
+import { SessionProvider } from "../components/providers/SessionProvider";
 
 export const metadata: Metadata = {
-  title: "Family App with Vanilla Extract",
-  description: "A Next.js app configured with vanilla-extract CSS-in-JS",
+  title: "Family App",
+  description: "A comprehensive family organization app",
 };
 
 export default function RootLayout({
@@ -14,7 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={themeClass}>{children}</body>
+      <body className={themeClass}>
+        <SessionProvider>
+          {children}
+        </SessionProvider>
+      </body>
     </html>
   );
 }

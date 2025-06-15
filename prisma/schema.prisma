@@ -57,9 +57,10 @@ enum StreamingGoalType {
 model User {
   id          String   @id @default(cuid())
   email       String   @unique
-  username    String   @unique
-  firstName   String
-  lastName    String
+  username    String?  @unique
+  name        String
+  firstName   String?
+  lastName    String?
   dateOfBirth DateTime?
   profilePicture String?
   bio         String?

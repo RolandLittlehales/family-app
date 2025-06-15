@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
+import { useAuth } from "../hooks/useAuth";
 
 import * as styles from "./Header.css";
 
@@ -30,6 +32,7 @@ export function Header({
 }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { user, isAuthenticated } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -68,7 +71,20 @@ export function Header({
           ))}
         </nav>
 
-        {/* Theme Toggle - TODO: Implement theme toggle */}
+        {/* User Menu */}
+        {isAuthenticated && user && (
+          <div className={styles.userMenu}>
+            <span className={styles.userName}>
+              {user.name}
+            </span>
+            <button 
+              onClick={() => signOut()}
+              className={styles.signOutButton}
+            >
+              Sign Out
+            </button>
+          </div>
+        )}
 
         {/* Mobile Menu Button */}
         <button
