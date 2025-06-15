@@ -1,9 +1,16 @@
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
+import "@testing-library/jest-dom";
 
 beforeAll(async () => {
   // Set test environment variables
-  Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', writable: true });
-  Object.defineProperty(process.env, 'DATABASE_URL', { value: 'file:./test.db', writable: true });
+  Object.defineProperty(process.env, "NODE_ENV", {
+    value: "test",
+    writable: true,
+  });
+  Object.defineProperty(process.env, "DATABASE_URL", {
+    value: "file:./test.db",
+    writable: true,
+  });
 });
 
 afterAll(async () => {
