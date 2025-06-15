@@ -37,6 +37,9 @@ const eslintConfig = [
       ".env.*",
       "*.log",
       ".DS_Store",
+      "src/generated/**",
+      "jest.config.js",
+      "tests/**",
     ],
   },
 
