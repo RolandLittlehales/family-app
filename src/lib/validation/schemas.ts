@@ -5,7 +5,13 @@ import { UserRole, BookStatus, StreamingStatus, ContentType } from '../../genera
 export const IdSchema = z.string().cuid();
 export const EmailSchema = z.string().email();
 export const UsernameSchema = z.string().min(2).max(50).regex(/^[a-zA-Z0-9_-]+$/);
-export const PasswordSchema = z.string().min(8).max(128);
+export const PasswordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(128, 'Password must be less than 128 characters')
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+  );
 export const RatingSchema = z.number().min(1).max(5);
 export const InviteCodeSchema = z.string().length(8).regex(/^[A-Z0-9]+$/);
 

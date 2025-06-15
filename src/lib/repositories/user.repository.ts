@@ -24,7 +24,7 @@ export interface UpdateUserData {
   bio?: string;
   role?: UserRole;
   isActive?: boolean;
-  emailVerified?: boolean;
+  emailVerified?: Date | null;
   familyId?: string;
 }
 
@@ -32,7 +32,7 @@ export interface UserFilters {
   familyId?: string;
   role?: UserRole;
   isActive?: boolean;
-  emailVerified?: boolean;
+  emailVerified?: boolean; // Keep as boolean for filtering (true = not null, false = null)
   search?: string;
 }
 
@@ -102,7 +102,7 @@ export class UserRepository extends BaseRepository {
     }
     
     if (filters.emailVerified !== undefined) {
-      where.emailVerified = filters.emailVerified;
+      where.emailVerified = filters.emailVerified ? { not: null } : null;
     }
     
     if (filters.search) {
@@ -181,21 +181,11 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async setEmailVerificationToken(id: string, token: string): Promise<User> {
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        emailVerificationToken: token,
-      },
-    });
-  }
-
   async verifyEmail(id: string): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data: {
-        emailVerified: true,
-        emailVerificationToken: null,
+        emailVerified: new Date(),
       },
     });
   }
@@ -211,13 +201,6 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async findByEmailVerificationToken(token: string): Promise<User | null> {
-    return this.prisma.user.findFirst({
-      where: {
-        emailVerificationToken: token,
-      },
-    });
-  }
 
   async getFamilyMembers(familyId: string): Promise<User[]> {
     return this.prisma.user.findMany({
