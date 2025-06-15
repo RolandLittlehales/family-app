@@ -153,8 +153,55 @@ globalStyle("@media (max-width: 768px)", { ... }); // Wrong syntax
 
 ## URLs Currently Working
 
-✅ `http://localhost:3002/` - Home page with navigation cards  
-✅ `http://localhost:3002/books` - Books management with stats and feature cards  
-✅ `http://localhost:3002/streaming` - Streaming services with preview cards
+✅ `http://localhost:3000/` - Home page with navigation cards  
+✅ `http://localhost:3000/books` - Books management with stats and feature cards  
+✅ `http://localhost:3000/streaming` - Streaming services with preview cards
 
 All pages are fully responsive and use the vanilla-extract theme system consistently.
+
+## Setup and Development Environment
+
+### 8. **Development Environment Documentation**
+
+**Problem**: New developers needed comprehensive setup documentation beyond basic Next.js boilerplate.
+
+**Solution Created**:
+
+- **Updated README.md**: Complete project-specific setup guide with technology stack, scripts, and troubleshooting
+- **Created .env.example**: Template for future environment configuration with comprehensive examples
+- **Setup Validation Script**: `npm run setup:check` validates entire development environment
+- **Onboarding Checklist**: ONBOARDING.md with step-by-step developer setup process
+
+**Key Setup Files Added**:
+
+- `README.md` - Project overview and development workflow
+- `.env.example` - Environment configuration template
+- `scripts/setup-check.js` - Automated environment validation
+- `ONBOARDING.md` - Developer onboarding checklist
+
+**Setup Validation Checks**:
+
+1. Node.js version (18+)
+2. npm availability
+3. Required project files
+4. Dependencies installation
+5. Package scripts configuration
+6. Environment template
+7. TypeScript compilation
+8. ESLint validation
+9. Build success
+10. Dev server configuration
+
+**New npm Scripts**:
+
+- `setup:check` - Validates complete development environment
+
+**Lesson**: **Comprehensive documentation and automation reduces onboarding friction and ensures consistent development environments.**
+
+### Environment Configuration Insights
+
+**Current State**: App runs without environment variables - pure frontend prototype
+
+**Prepared For**: Database integration, external APIs, authentication, file storage, analytics
+
+**Environment Structure**: Organized by feature area with clear examples and documentation

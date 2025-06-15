@@ -2,22 +2,22 @@
 /**
  * Family App Setup Validation Script
  * Validates development environment and dependencies
+ * @eslint-disable no-console, @typescript-eslint/no-require-imports
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require("fs");
+const { execSync } = require("child_process");
 
 // Colors for console output
 const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m'
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
 };
 
 function log(message, color = colors.reset) {
@@ -46,21 +46,21 @@ function header(message) {
 
 function getVersion(command) {
   try {
-    const output = execSync(command, { encoding: 'utf8', stderr: 'ignore' });
+    const output = execSync(command, { encoding: "utf8", stderr: "ignore" });
     return output.trim();
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
 function checkNodeVersion() {
-  const nodeVersion = getVersion('node --version');
+  const nodeVersion = getVersion("node --version");
   if (!nodeVersion) {
-    error('Node.js is not installed');
+    error("Node.js is not installed");
     return false;
   }
 
-  const majorVersion = parseInt(nodeVersion.replace('v', '').split('.')[0]);
+  const majorVersion = parseInt(nodeVersion.replace("v", "").split(".")[0]);
   if (majorVersion < 18) {
     error(`Node.js ${nodeVersion} is installed, but version 18+ is required`);
     return false;
@@ -71,9 +71,9 @@ function checkNodeVersion() {
 }
 
 function checkNpmVersion() {
-  const npmVersion = getVersion('npm --version');
+  const npmVersion = getVersion("npm --version");
   if (!npmVersion) {
-    error('npm is not installed');
+    error("npm is not installed");
     return false;
   }
 
@@ -83,16 +83,16 @@ function checkNpmVersion() {
 
 function checkProjectFiles() {
   const requiredFiles = [
-    'package.json',
-    'next.config.ts',
-    'tsconfig.json',
-    'src/app/layout.tsx',
-    'src/app/page.tsx',
-    '.env.example'
+    "package.json",
+    "next.config.ts",
+    "tsconfig.json",
+    "src/app/layout.tsx",
+    "src/app/page.tsx",
+    ".env.example",
   ];
 
   let allFilesExist = true;
-  
+
   for (const file of requiredFiles) {
     if (fs.existsSync(file)) {
       success(`${file} exists`);
@@ -106,34 +106,34 @@ function checkProjectFiles() {
 }
 
 function checkNodeModules() {
-  if (!fs.existsSync('node_modules')) {
+  if (!fs.existsSync("node_modules")) {
     warning('node_modules directory not found - run "npm install"');
     return false;
   }
 
-  if (!fs.existsSync('package-lock.json')) {
-    warning('package-lock.json not found - dependencies may not be locked');
+  if (!fs.existsSync("package-lock.json")) {
+    warning("package-lock.json not found - dependencies may not be locked");
     return false;
   }
 
-  success('node_modules and package-lock.json are present');
+  success("node_modules and package-lock.json are present");
   return true;
 }
 
 function checkScripts() {
   try {
-    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
     const requiredScripts = [
-      'dev',
-      'build',
-      'start',
-      'lint',
-      'type-check',
-      'quality'
+      "dev",
+      "build",
+      "start",
+      "lint",
+      "type-check",
+      "quality",
     ];
 
     let allScriptsExist = true;
-    
+
     for (const script of requiredScripts) {
       if (packageJson.scripts && packageJson.scripts[script]) {
         success(`Script "${script}" is configured`);
@@ -145,22 +145,22 @@ function checkScripts() {
 
     return allScriptsExist;
   } catch (e) {
-    error('Could not read package.json');
+    error("Could not read package.json");
     return false;
   }
 }
 
 function checkEnvironment() {
-  if (fs.existsSync('.env.local')) {
-    info('.env.local file exists');
+  if (fs.existsSync(".env.local")) {
+    info(".env.local file exists");
   } else {
-    info('.env.local not found (this is optional for current setup)');
+    info(".env.local not found (this is optional for current setup)");
   }
 
-  if (fs.existsSync('.env.example')) {
-    success('.env.example template exists');
+  if (fs.existsSync(".env.example")) {
+    success(".env.example template exists");
   } else {
-    warning('.env.example template is missing');
+    warning(".env.example template is missing");
   }
 
   return true;
@@ -168,23 +168,25 @@ function checkEnvironment() {
 
 function runBuildTest() {
   try {
-    info('Running build test...');
-    execSync('npm run build', { stdio: 'ignore' });
-    success('Build test passed');
+    info("Running build test...");
+    execSync("npm run build", { stdio: "ignore" });
+    success("Build test passed");
     return true;
-  } catch (e) {
-    error('Build test failed - check for TypeScript errors or missing dependencies');
+  } catch {
+    error(
+      "Build test failed - check for TypeScript errors or missing dependencies"
+    );
     return false;
   }
 }
 
 function runLintTest() {
   try {
-    info('Running lint test...');
-    execSync('npm run lint:check', { stdio: 'ignore' });
-    success('Lint test passed');
+    info("Running lint test...");
+    execSync("npm run lint:check", { stdio: "ignore" });
+    success("Lint test passed");
     return true;
-  } catch (e) {
+  } catch {
     warning('Lint test failed - run "npm run lint:fix" to auto-fix issues');
     return false;
   }
@@ -192,12 +194,12 @@ function runLintTest() {
 
 function runTypeCheck() {
   try {
-    info('Running TypeScript check...');
-    execSync('npm run type-check', { stdio: 'ignore' });
-    success('TypeScript check passed');
+    info("Running TypeScript check...");
+    execSync("npm run type-check", { stdio: "ignore" });
+    success("TypeScript check passed");
     return true;
-  } catch (e) {
-    error('TypeScript check failed - fix type errors before continuing');
+  } catch {
+    error("TypeScript check failed - fix type errors before continuing");
     return false;
   }
 }
@@ -206,65 +208,72 @@ function checkDevServer() {
   // We can't actually start the dev server in this script,
   // but we can check if the dev script exists and dependencies are ready
   try {
-    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
     if (packageJson.scripts && packageJson.scripts.dev) {
-      success('Dev server script is configured');
+      success("Dev server script is configured");
       info('Run "npm run dev" to start the development server');
       return true;
     } else {
-      error('Dev server script is missing');
+      error("Dev server script is missing");
       return false;
     }
-  } catch (e) {
-    error('Could not verify dev server configuration');
+  } catch {
+    error("Could not verify dev server configuration");
     return false;
   }
 }
 
 function showSummary(results) {
-  header('Setup Validation Summary');
-  
+  header("Setup Validation Summary");
+
   const passed = results.filter(r => r.passed).length;
   const total = results.length;
-  
+
   if (passed === total) {
-    success(`All ${total} checks passed! Your development environment is ready.`);
-    info('\nNext steps:');
+    success(
+      `All ${total} checks passed! Your development environment is ready.`
+    );
+    info("\nNext steps:");
     info('1. Run "npm run dev" to start the development server');
-    info('2. Open http://localhost:3000 in your browser');
-    info('3. Check the README.md for detailed development workflow');
+    info("2. Open http://localhost:3000 in your browser");
+    info("3. Check the README.md for detailed development workflow");
   } else {
-    warning(`${passed}/${total} checks passed. Please address the issues above.`);
-    info('\nFor help troubleshooting:');
-    info('1. Check the Troubleshooting section in README.md');
-    info('2. Review DEVELOPMENT_LEARNINGS.md for detailed setup insights');
+    warning(
+      `${passed}/${total} checks passed. Please address the issues above.`
+    );
+    info("\nFor help troubleshooting:");
+    info("1. Check the Troubleshooting section in README.md");
+    info("2. Review DEVELOPMENT_LEARNINGS.md for detailed setup insights");
     info('3. Ensure all dependencies are installed with "npm install"');
   }
 }
 
 // Main execution
 async function main() {
-  header('🚀 Family App Setup Validation');
-  
+  header("🚀 Family App Setup Validation");
+
   const results = [
-    { name: 'Node.js Version', passed: checkNodeVersion() },
-    { name: 'npm Version', passed: checkNpmVersion() },
-    { name: 'Project Files', passed: checkProjectFiles() },
-    { name: 'Dependencies', passed: checkNodeModules() },
-    { name: 'Package Scripts', passed: checkScripts() },
-    { name: 'Environment Config', passed: checkEnvironment() },
-    { name: 'TypeScript Check', passed: runTypeCheck() },
-    { name: 'Lint Check', passed: runLintTest() },
-    { name: 'Build Test', passed: runBuildTest() },
-    { name: 'Dev Server Config', passed: checkDevServer() }
+    { name: "Node.js Version", passed: checkNodeVersion() },
+    { name: "npm Version", passed: checkNpmVersion() },
+    { name: "Project Files", passed: checkProjectFiles() },
+    { name: "Dependencies", passed: checkNodeModules() },
+    { name: "Package Scripts", passed: checkScripts() },
+    { name: "Environment Config", passed: checkEnvironment() },
+    { name: "TypeScript Check", passed: runTypeCheck() },
+    { name: "Lint Check", passed: runLintTest() },
+    { name: "Build Test", passed: runBuildTest() },
+    { name: "Dev Server Config", passed: checkDevServer() },
   ];
 
   showSummary(results);
-  
+
   // Exit with error code if any checks failed
   const allPassed = results.every(r => r.passed);
   process.exit(allPassed ? 0 : 1);
 }
 
 // Run the validation
-main().catch(console.error);
+main().catch(error => {
+  console.error("Setup validation failed:", error);
+  process.exit(1);
+});

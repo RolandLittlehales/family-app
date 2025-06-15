@@ -25,6 +25,7 @@ const eslintConfig = [
       "out/**",
       "build/**",
       ".vercel/**",
+      "scripts/**",
       "*.tsbuildinfo",
       "next-env.d.ts",
       "*.config.js",
