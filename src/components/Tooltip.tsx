@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import * as styles from "./Tooltip.css";
 
 export interface TooltipProps {
@@ -108,13 +108,16 @@ export function Popover({
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
 
-  const setOpen = (newOpen: boolean) => {
-    if (isControlled) {
-      onOpenChange?.(newOpen);
-    } else {
-      setInternalOpen(newOpen);
-    }
-  };
+  const setOpen = useCallback(
+    (newOpen: boolean) => {
+      if (isControlled) {
+        onOpenChange?.(newOpen);
+      } else {
+        setInternalOpen(newOpen);
+      }
+    },
+    [isControlled, onOpenChange]
+  );
 
   const handleTriggerClick = () => {
     if (trigger === "click") {

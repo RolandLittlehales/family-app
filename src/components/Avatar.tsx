@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import * as styles from "./Avatar.css";
 
 export interface AvatarProps {
@@ -66,11 +67,13 @@ export function Avatar({
   const renderContent = () => {
     if (src && !imageError) {
       return (
-        <img
+        <Image
           src={src}
           alt={alt || "Avatar"}
           className={imageClass}
           onError={handleImageError}
+          width={64}
+          height={64}
         />
       );
     }

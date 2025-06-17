@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import * as styles from "./Card.css";
 
 export interface CardProps {
@@ -79,7 +80,13 @@ export function CardFooter({ children, className = "" }: CardFooterProps) {
 export function CardMedia({ src, alt, className = "" }: CardMediaProps) {
   return (
     <div className={styles.cardMediaContainer}>
-      <img src={src} alt={alt} className={`${styles.cardMedia} ${className}`} />
+      <Image
+        src={src}
+        alt={alt}
+        className={`${styles.cardMedia} ${className}`}
+        width={400}
+        height={250}
+      />
     </div>
   );
 }

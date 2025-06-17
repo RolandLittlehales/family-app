@@ -5,16 +5,16 @@ import * as styles from "./Table.css";
 
 export type SortDirection = "asc" | "desc" | null;
 
-export interface TableColumn<T = any> {
+export interface TableColumn<T = Record<string, unknown>> {
   key: string;
   header: string;
   sortable?: boolean;
   align?: "left" | "center" | "right" | "numeric";
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
   width?: string;
 }
 
-export interface TableProps<T = any> {
+export interface TableProps<T = Record<string, unknown>> {
   columns: TableColumn<T>[];
   data: T[];
   loading?: boolean;
@@ -127,7 +127,7 @@ function Pagination({
   );
 }
 
-export function Table<T = any>({
+export function Table<T = Record<string, unknown>>({
   columns,
   data,
   loading = false,
@@ -170,8 +170,8 @@ export function Table<T = any>({
     if (!sortKey || !sortDirection) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = (a as Record<string, any>)[sortKey];
-      const bValue = (b as Record<string, any>)[sortKey];
+      const aValue = (a as Record<string, unknown>)[sortKey];
+      const bValue = (b as Record<string, unknown>)[sortKey];
 
       if (aValue === bValue) return 0;
       if (aValue == null) return 1;
@@ -191,7 +191,7 @@ export function Table<T = any>({
 
   const totalPages = paginated ? Math.ceil(sortedData.length / pageSize) : 1;
 
-  const getCellAlignment = (column: TableColumn) => {
+  const getCellAlignment = (column: TableColumn<T>) => {
     switch (column.align) {
       case "numeric":
         return styles.tableCellVariants.numeric;
@@ -203,7 +203,7 @@ export function Table<T = any>({
   };
 
   const renderCellContent = (column: TableColumn<T>, row: T) => {
-    const value = (row as Record<string, any>)[column.key];
+    const value = (row as Record<string, unknown>)[column.key];
     return column.render ? column.render(value, row) : String(value ?? "");
   };
 

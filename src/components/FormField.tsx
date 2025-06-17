@@ -44,7 +44,7 @@ export function FormField({
       [helpTextId, errorId, successId].filter(Boolean).join(" ") || undefined,
     "aria-invalid": error ? true : undefined,
     "aria-required": required ? true : undefined,
-  } as any);
+  } as React.HTMLAttributes<HTMLElement>);
 
   return (
     <div className={`${styles.formField} ${className}`}>

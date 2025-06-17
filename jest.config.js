@@ -18,6 +18,9 @@ module.exports = {
   },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^../styles/theme.css$":
+      "<rootDir>/tests/__mocks__/src/styles/theme.css.ts",
+    "\\.css\\.ts$": "identity-obj-proxy",
   },
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",

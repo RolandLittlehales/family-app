@@ -5,7 +5,7 @@ export type ValidationRule = {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
-  custom?: (value: any) => string | undefined;
+  custom?: (value: unknown) => string | undefined;
 };
 
 export type FieldValidation = {
@@ -17,14 +17,14 @@ export type FormErrors = {
 };
 
 export type FormValues = {
-  [fieldName: string]: any;
+  [fieldName: string]: unknown;
 };
 
 export interface UseFormValidationReturn {
   values: FormValues;
   errors: FormErrors;
   isValid: boolean;
-  setValue: (name: string, value: any) => void;
+  setValue: (name: string, value: unknown) => void;
   setError: (name: string, error: string | undefined) => void;
   validate: (name?: string) => boolean;
   validateAll: () => boolean;
@@ -42,7 +42,7 @@ export function useFormValidation(
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validateField = useCallback(
-    (name: string, value: any): string | undefined => {
+    (name: string, value: unknown): string | undefined => {
       const rules = validationRules[name];
       if (!rules) return undefined;
 
@@ -83,7 +83,7 @@ export function useFormValidation(
   );
 
   const setValue = useCallback(
-    (name: string, value: any) => {
+    (name: string, value: unknown) => {
       setValues(prev => ({ ...prev, [name]: value }));
 
       // Clear error when user starts typing
